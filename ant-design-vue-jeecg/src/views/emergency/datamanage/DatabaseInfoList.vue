@@ -152,11 +152,11 @@
           }
         ],
         url: {
-          list: "/databasemanage/databaseInfo/list",
-          delete: "/databasemanage/databaseInfo/delete",
-          deleteBatch: "/databasemanage/databaseInfo/deleteBatch",
-          exportXlsUrl: "/databasemanage/databaseInfo/exportXls",
-          importExcelUrl: "databasemanage/databaseInfo/importExcel",
+          list: "/datamange/databaseInfo/list",
+          delete: "/datamange/databaseInfo/delete",
+          deleteBatch: "/datamange/databaseInfo/deleteBatch",
+          exportXlsUrl: "/datamange/databaseInfo/exportXls",
+          importExcelUrl: "datamange/databaseInfo/importExcel",
           
         },
         dictOptions:{},

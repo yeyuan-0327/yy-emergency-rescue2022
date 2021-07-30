@@ -62,9 +62,9 @@
         validatorRules: {
         },
         url: {
-          add: "/databasemanage/databaseInfo/add",
-          edit: "/databasemanage/databaseInfo/edit",
-          queryById: "/databasemanage/databaseInfo/queryById"
+          add: "/datamange/databaseInfo/add",
+          edit: "/datamange/databaseInfo/edit",
+          queryById: "/datamange/databaseInfo/queryById"
         }
       }
     },
