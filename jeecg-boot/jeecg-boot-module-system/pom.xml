@@ -10,7 +10,7 @@
 
 	<artifactId>jeecg-boot-module-system</artifactId>
 
-	<repositories>
+    <repositories>
 		<repository>
 			<id>aliyun</id>
 			<name>aliyun Repository</name>

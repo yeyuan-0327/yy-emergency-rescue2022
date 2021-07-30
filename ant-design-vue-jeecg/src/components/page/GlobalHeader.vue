@@ -18,7 +18,7 @@
         @click="toggle"/>
 
       <span v-if="device === 'desktop'">欢迎进入 应急资源调度 平台</span>
-      <span v-else>Jeecg-Boot</span>
+      <span v-else>欢迎进入 应急资源调度 平台</span>
 
       <user-menu :theme="theme"/>
     </div>
