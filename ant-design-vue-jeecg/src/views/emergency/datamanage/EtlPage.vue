@@ -12,7 +12,7 @@
 
 <script>
   export default {
-    name: 'Etlpage'
+    name: 'EtlPage'
   }
 </script>
 

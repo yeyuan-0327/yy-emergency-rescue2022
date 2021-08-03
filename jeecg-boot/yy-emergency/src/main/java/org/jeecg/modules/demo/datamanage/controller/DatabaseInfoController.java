@@ -1,4 +1,4 @@
-package org.jeecg.modules.demo.datamange.controller;
+package org.jeecg.modules.demo.datamanage.controller;
 
 import java.util.Arrays;
 import java.util.List;
@@ -12,8 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.util.oConvertUtils;
-import org.jeecg.modules.demo.datamange.entity.DatabaseInfo;
-import org.jeecg.modules.demo.datamange.service.IDatabaseInfoService;
+import org.jeecg.modules.demo.datamanage.entity.DatabaseInfo;
+import org.jeecg.modules.demo.datamanage.service.IDatabaseInfoService;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -39,12 +39,12 @@ import org.jeecg.common.aspect.annotation.AutoLog;
  /**
  * @Description: 基础数据库信息表
  * @Author: jeecg-boot
- * @Date:   2021-07-30
+ * @Date:   2021-08-01
  * @Version: V1.0
  */
 @Api(tags="基础数据库信息表")
 @RestController
-@RequestMapping("/datamange/databaseInfo")
+@RequestMapping("/datamanage/databaseInfo")
 @Slf4j
 public class DatabaseInfoController extends JeecgController<DatabaseInfo, IDatabaseInfoService> {
 	@Autowired

@@ -60,11 +60,20 @@
         },
         confirmLoading: false,
         validatorRules: {
+           name: [
+              { required: true, message: '请输入表名!'},
+           ],
+           chineseName: [
+              { required: true, message: '请输入中文名!'},
+           ],
+           databaseProject: [
+              { required: true, message: '请输入数据库类型!'},
+           ],
         },
         url: {
-          add: "/datamange/databaseInfo/add",
-          edit: "/datamange/databaseInfo/edit",
-          queryById: "/datamange/databaseInfo/queryById"
+          add: "/datamanage/databaseInfo/add",
+          edit: "/datamanage/databaseInfo/edit",
+          queryById: "/datamanage/databaseInfo/queryById"
         }
       }
     },

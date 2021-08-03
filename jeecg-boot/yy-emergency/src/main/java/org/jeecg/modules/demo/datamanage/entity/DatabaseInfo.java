@@ -1,4 +1,4 @@
-package org.jeecg.modules.demo.datamange.entity;
+package org.jeecg.modules.demo.datamanage.entity;
 
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -20,7 +20,7 @@ import lombok.experimental.Accessors;
 /**
  * @Description: 基础数据库信息表
  * @Author: jeecg-boot
- * @Date:   2021-07-30
+ * @Date:   2021-08-01
  * @Version: V1.0
  */
 @Data
