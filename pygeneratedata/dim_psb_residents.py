@@ -357,7 +357,7 @@ def insertQueueIntoDatabase(q_id, q_nation, q_sex, q_birth, q_edu, q_family_type
         native_place = q_city.get()
         occupation = check_age_occupation(age, q_occupation)
         marital_status = check_age_marry(age, sex, q_m)
-        insertSingle(person_id, nation, sex, person_name, birth, education, family_type, family_id, height,
+        insertSingle(person_id, person_name, nation, sex, birth, education, family_type, family_id, height,
                      military_status, address, native_place, occupation, marital_status, cur)
     cur.close()
 
