@@ -346,7 +346,7 @@ def insertQueueIntoDatabase(q_id, q_nation, q_sex, q_birth, q_edu, q_family_type
         person_name = check_sex_name(sex)
         birth = q_birth.get()
         b_s = birth.split('-')
-        person_id = person_id[0:6] + b_s[0] + b_s[1] + b_s[2] + person_id[14:18]
+        person_id = '522' + person_id[3:6] + b_s[0] + b_s[1] + b_s[2] + person_id[14:18]
         age = 2021 - int(b_s[0])
         education = check_edu_age(q_edu, age)
         family_type = q_family_type.get()
