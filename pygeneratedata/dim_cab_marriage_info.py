@@ -1,3 +1,6 @@
+import datetime
+import random
+
 import pymysql
 
 # 连接MySQL数据库
@@ -19,7 +22,7 @@ def insert(a, b, cur):
     for i in range(len(a)):
         man = a[i]
         woman = b[i]
-        check_time = man[2]
+        check_time = man[2] + datetime.timedelta(random.random()*100)
         sql = "INSERT INTO dim_cab_marriage_info() VALUES('{man_person_id}','{man_person_name}','{check_time}'," \
               "'{woman_person_id}','{woman_person_name}')".format(man_person_id=man[0], man_person_name=man[1],
                                                                   check_time=check_time, woman_person_id=woman[0],
@@ -27,6 +30,7 @@ def insert(a, b, cur):
         print(sql)
         cur.execute(sql)
         mysql_conn.commit()
+
 
 def generate_marriage():
     cur = mysql_conn.cursor()
