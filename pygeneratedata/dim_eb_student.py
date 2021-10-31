@@ -8,7 +8,7 @@ fake = Faker('zh_CN')
 mysql_conn = pymysql.connect(host="192.168.101.105", user="root", password="123456", db="dim", port=3306,
                              charset='utf8')
 cur = mysql_conn.cursor()
-school_list = open("school.txt", encoding='utf-8', errors='ignore').readlines()
+school_list = list(filter(lambda x: x != '\n', open("school.txt", encoding='utf-8', errors='ignore').readlines()))
 major_list = list(filter(lambda x: re.match('.*类', x) is None,
                   filter(lambda x: x != '\n', open("major.txt", encoding='utf-8', errors='ignore').readlines()))
                   )
