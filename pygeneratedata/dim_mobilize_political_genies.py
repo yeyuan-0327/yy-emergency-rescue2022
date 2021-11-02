@@ -25,13 +25,13 @@ def insert_genies(person_id, person_name, phone, sex, nation, political_status, 
                   graduate_school, education, certified, work_year):
     sql = "INSERT INTO dim_mobilize_political_genies() VALUES ('{person_id}', '{person_name}', '{phone}', '{sex}', '{nation}', " \
           "'{political_status}', '{marital_status}', '{age}', '{address}', '{birth}', '{graduate_school}', '{education}', " \
-          "'{certified}', '{work_year}')".format(person_id=person_id, person_name=person_name, phone=phone, sex=sex,
-                                                 nation=nation,
-                                                 political_status=political_status, marital_status=marital_status,
-                                                 age=age,
-                                                 address=address, birth=birth, graduate_school=graduate_school,
-                                                 education=education,
-                                                 certified=certified, work_year=work_year)
+          "'{certified}', '{work_year}');".format(person_id=person_id, person_name=person_name, phone=phone, sex=sex,
+                                                  nation=nation,
+                                                  political_status=political_status, marital_status=marital_status,
+                                                  age=age,
+                                                  address=address, birth=birth, graduate_school=graduate_school,
+                                                  education=education,
+                                                  certified=certified, work_year=work_year)
     print(sql)
     cur.execute(sql)
     mysql_conn.commit()
