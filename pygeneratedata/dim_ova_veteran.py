@@ -19,7 +19,7 @@ def search_resident():
 
 
 def search_people(pid):
-    sql = "SELECT person_id, person_name, political_status, nation, person_phone, address FROM dim_hrssb_personal WHERE person_id = '{pid}';".format(pid=pid)
+    sql = "SELECT person_id, person_name, political_status, nation, person_phone, address, sex, birth, education FROM dim_hrssb_personal WHERE person_id = '{pid}';".format(pid=pid)
     cur.execute(sql)
     return cur.fetchone()
 
