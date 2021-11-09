@@ -21,11 +21,10 @@ def search_driver():
 
 def generate_number():
     code = ""
-    li = list('A B C D E F G H'.split(' '))
     ll = list('A B C D E F G H 1 2 3 4 5 6 7 8 9 0'.split(' '))
     for i in range(5):
         code += random.choice(ll)
-    return '贵' + random.choice(li) + '-' + code
+    return '贵A' + '-' + code
 
 
 def get_enterprise_no():
@@ -61,25 +60,31 @@ def insert_vehicle_driver(person_id, person_name, bound_vehicle, affiliated_ente
     mysql_conn.commit()
 
 
+def search_vehicle_no():
+    sql = "SELECT vehicle_no, phone, register_date, expiration_date, drive_model FROM dim_mta_vehicle;"
+    cur.execute(sql)
+    return cur.fetchall()
+
+
 def generate_vehicle_driver():
     enter_id_list = get_enterprise_no()
     address_list = search_random_address()
     enter_list = search_enterprise()
+    vehicle_no_list = search_vehicle_no()
     for i in range(10000):
         person_id = "520100" + str(random.randint(1980, 2000)) + fake.ssn()[10:]
-        f = random.randint(0, 10)
+        f = random.randint(0, 10)  # 判断男女
         person_name = fake.name_male() if f == 0 else fake.name_female()
-        bound_vehicle = generate_number()
+        bound_vehicle = vehicle_no_list[i][0]
         affiliated_enterprise = random.choice(enter_id_list)
-        phone = fake.phone_number()
+        phone = vehicle_no_list[i][1]
         work_year = random.randint(3, 20)
-        year, month, day = random_generate_date()
-        certified_date = year + month + day
-        validity_date = str(int(year) + 6) + month + day
+        certified_date = vehicle_no_list[i][2]
+        validity_date = vehicle_no_list[i][3]
         area = "贵阳市"
         sex = "女" if f == 0 else "男"
         address = random.choice(address_list)
-        drive_model = random.choice(driver_model_list)
+        drive_model = vehicle_no_list[i][4]
         certified_status = "正常"
         point_deduction = random.randint(0, 9)
         zhima_credit = random.randint(600, 799)
