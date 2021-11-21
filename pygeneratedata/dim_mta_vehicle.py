@@ -16,6 +16,7 @@ brand_list = ['解放FAW', '东风DFM', '中国重汽CNHTC', '福田欧曼AUMAN'
               '华菱星马CAMC', '三一重卡SANY', '比亚迪']
 range_list = ['南明', '云岩', '花溪', '乌当', '白云', '观山湖', '清镇', '开阳', '息烽', '修文']
 driver_model_list = ['大型客车', '牵引车', '城市公交车', '中型客车', '大型货车']
+color_list = ['红', '黄', '蓝', '绿', '青', '白', '黑', '橙色']
 
 
 def random_type():
@@ -64,7 +65,7 @@ def generate_vehicle():
         phone = fake.phone_number()
         passenger_num = 2 if (drive_model != "城市公交车") | (drive_model != "大型客车") else random.randint(10, 30)
         actual_weight = str(random.randint(10, 20)) + "t"
-        vehicle_color = fake.color_name()
+        vehicle_color = random.choice(color_list)
         year, month, day = random_generate_date()
         register_date = year + month + day
         expiration_date = str(int(year) + 6) + month + day

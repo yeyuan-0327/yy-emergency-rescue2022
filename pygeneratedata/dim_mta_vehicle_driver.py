@@ -72,7 +72,7 @@ def generate_vehicle_driver():
     enter_list = search_enterprise()
     vehicle_no_list = search_vehicle_no()
     for i in range(10000):
-        person_id = "520100" + str(random.randint(1980, 2000)) + fake.ssn()[10:]
+        person_id = "52"+str(random.randint(0, 10))+str(random.randint(100, 110)) + str(random.randint(1980, 2000)) + fake.ssn()[10:]
         f = random.randint(0, 10)  # 判断男女
         person_name = fake.name_male() if f == 0 else fake.name_female()
         bound_vehicle = vehicle_no_list[i][0]
