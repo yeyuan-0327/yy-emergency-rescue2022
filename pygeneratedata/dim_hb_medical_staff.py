@@ -52,9 +52,7 @@ def generate_medical_staff():
     for i in range(6430):
         person_id = fake.ssn()
         year = str(2021 - random.randint(23, 70))
-        month = str(random.randint(1, 12))
-        day = str(random.randint(1, 28))
-        person_id = '522' + person_id[3:6] + year + month + day + person_id[14:18]
+        person_id = person_id[0:6] + year + person_id[10:14] + person_id[14:18]
         sex = '男' if random.randint(0, 1) == 1 else '女'
         person_name = check_sex_name(sex)
         age = 2021 - int(year)
@@ -82,9 +80,7 @@ def generate_medical_nurse_staff():
     for i in range(7610):
         person_id = fake.ssn()
         year = str(2021 - random.randint(20, 60))
-        month = str(random.randint(1, 12))
-        day = str(random.randint(1, 28))
-        person_id = '522' + person_id[3:6] + year + month + day + person_id[14:18]
+        person_id = person_id[0:6] + year + person_id[10:14] + person_id[14:18]
         sex = '男' if random.randint(0, 9) == 0 else '女'
         person_name = check_sex_name(sex)
         age = 2021 - int(year)
