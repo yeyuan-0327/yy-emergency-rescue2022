@@ -18,7 +18,7 @@ team_map = {'抢险抢修专业队': '主要负责抢建、抢修人防工程、
 equipment_list = ['化学防护服', '气密性重型防护服', '工业有毒有害气体检测仪', '侦毒器', '军用辐射仪', '放射性检测仪', '救援抛绳器', '生命探测仪',
                   '锯木机', '锯路机', '金属救援撑杆', '坑道排烟机', '手动破拆工具', '剪扩钳']
 district_list = ['贵阳市南明区', '贵阳市云岩区', '贵阳市花溪区', '贵阳市乌当区', '贵阳市白云区', '贵阳市观山湖区', '贵阳市息烽县',
-                '贵阳市清镇市', '贵阳市修文县', '贵阳市开阳县']
+                 '贵阳市清镇市', '贵阳市修文县', '贵阳市开阳县']
 
 
 def InsertTeam(team_name, create_time, main_mission, self_equipment, team_member_num, response_person, response_person_phone,
@@ -53,9 +53,10 @@ def setEquipment(team_member_num):
 
 def GenerateTeam():
     for i in range(100):
-        team_name = random.choice(team_list)
+        temp_name = random.choice(team_list)
+        team_name = "第"+str(i+1)+temp_name
         create_time = str(random.randint(2000, 2021)) + fake.date()[4:]
-        main_mission = team_map[team_name]
+        main_mission = team_map[temp_name]
         team_member_num = int(random.randint(12, 500) * 0.7)
         self_equipment = setEquipment(team_member_num)
         response_person = fake.name()
