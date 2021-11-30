@@ -19,32 +19,30 @@ mysql_cur = mysql_conn.cursor()
 
 def SearchHuman():
     human_map = {}
-    sql = "SELECT person_id FROM dim_psb_residents;"
-    mysql_cur.execute(sql)
-    for i in mysql_cur.fetchall():
-        human_map[i[0]] = "dim_psb_residents"
-    # sql = "SELECT person_id FROM dim_hb_medical_staff;"
-    # mysql_cur.execute(sql)
-    # for i in mysql_cur.fetchall():
-    #     human_map[i] = "dim_hb_medical_staff"
-    # sql = "SELECT person_id FROM dim_mta_vehicle_driver;"
-    # mysql_cur.execute(sql)
-    # for i in mysql_cur.fetchall():
-    #     human_map[i] = "dim_mta_vehicle_driver"
+    human_list = ["dim_psb_residents", "dim_hb_medical_staff", "dim_mta_vehicle_driver"]
+    for table in human_list:
+        sql = "SELECT person_id FROM {table_name};".format(table_name=table)
+        mysql_cur.execute(sql)
+        for i in mysql_cur.fetchall():
+            human_map[i[0]] = table
     return human_map
 
 
 def FetchGeoFromGaoDe(address):
-    addr = urllib.parse.quote(address)
-    key = "fffd055b5ec8552655adf5797cda205f"
-    url = "http://restapi.amap.com/v3/geocode/geo?key="
-    new_url = url + key + "&address=" + addr
-    res = requests.get(new_url)
-    json_data = json.loads(res.text)
-    x = str(json_data['geocodes'][0]['location']).split(',')[0]
-    y = str(json_data['geocodes'][0]['location']).split(',')[1]
-    wkb_geometry = "POINT(" + x + " " + y + ")"
-    return wkb_geometry
+    try:
+        addr = urllib.parse.quote(address)
+        key = "fffd055b5ec8552655adf5797cda205f"
+        url = "http://restapi.amap.com/v3/geocode/geo?key="
+        new_url = url + key + "&address=" + addr
+        res = requests.get(new_url)
+        json_data = json.loads(res.text)
+        x = str(json_data['geocodes'][0]['location']).split(',')[0]
+        y = str(json_data['geocodes'][0]['location']).split(',')[1]
+        wkb_geometry = "POINT(" + x + " " + y + ")"
+        return wkb_geometry
+    except Exception as e:
+        print(e)
+        return "POINT(0 0)"
 
 
 def FetchOneSelectPid(select, table, pid):
@@ -96,17 +94,21 @@ def SetMedicalStaff(param):
         return 2
 
 
-def SearchExistHuman():
-    sql = "SELECT person_id FROM fact_human_resource;"
+def SearchExistHuman(exist_id, fact_table):
+    sql = "SELECT {exist_id} FROM {table_name};".format(exist_id=exist_id, table_name=fact_table)
     gp_cur.execute(sql)
     return gp_cur.fetchall()
 
 
+def PopExist(pop_map, exist_id, fact_table):
+    exist_human = SearchExistHuman(exist_id, fact_table)
+    for i in exist_human:
+        pop_map.pop(i[0])
+
+
 def GenerateFactHuman():
     human_map = SearchHuman()
-    exist_human = SearchExistHuman()
-    for i in exist_human:
-        human_map.pop(i[0])
+    PopExist(human_map, "person_id", "fact_human_resource")
     for i in human_map:
         person_id = i
         person_name = FetchOneSelectPid("person_name", human_map[i], person_id)
