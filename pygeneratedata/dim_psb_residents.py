@@ -346,7 +346,7 @@ def insertQueueIntoDatabase(q_id, q_nation, q_sex, q_birth, q_edu, q_family_type
         person_name = check_sex_name(sex)
         birth = q_birth.get()
         b_s = birth.split('-')
-        person_id = person_id[0:6] + b_s[0] + b_s[1] + b_s[2] + person_id[14:18]
+        person_id = '522' + person_id[3:6] + b_s[0] + b_s[1] + b_s[2] + person_id[14:18]
         age = 2021 - int(b_s[0])
         education = check_edu_age(q_edu, age)
         family_type = q_family_type.get()
@@ -357,7 +357,7 @@ def insertQueueIntoDatabase(q_id, q_nation, q_sex, q_birth, q_edu, q_family_type
         native_place = q_city.get()
         occupation = check_age_occupation(age, q_occupation)
         marital_status = check_age_marry(age, sex, q_m)
-        insertSingle(person_id, nation, sex, person_name, birth, education, family_type, family_id, height,
+        insertSingle(person_id, person_name, nation, sex, birth, education, family_type, family_id, height,
                      military_status, address, native_place, occupation, marital_status, cur)
     cur.close()
 

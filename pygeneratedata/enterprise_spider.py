@@ -88,7 +88,7 @@ def parse(html_content):
 
 
 if __name__ == '__main__':
-    for x in range(162, 501):
+    for x in range(1, 501):
         print(x)
         url = 'https://www.qcc.com/g_GZ_520100_' + str(x)
         html = get_one_page(url)
