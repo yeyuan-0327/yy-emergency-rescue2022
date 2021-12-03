@@ -113,7 +113,7 @@
                bordered
                :scroll="{ x: 300, y: 300 }"
                :columns="showDatabaseTableColumns"
-               :dataSource="showDatabaseSource"
+               :dataSource="showDatabaseTableColumnsInfo"
                :loading="showDatabaseTableLoading">
         <!--        :pagination="paginationDatabaseOpt"-->
       </a-table>
@@ -121,8 +121,8 @@
       <div v-show="showType === 'chart'" >
         <a-row :gutter="16">
           <a-col :span="12">
-            <a-card :bordered="true" style="height: 250px">
-              <div id="databaseColumnChart" :style="{width: '650px', height: '250px'}">
+            <a-card :bordered="false" style="height: 250px">
+              <div id="databaseColumnChart" :style="{width: '650px', height: '280px'}">
               </div>
             </a-card>
           </a-col>
@@ -134,7 +134,7 @@
         <br/>
         <a-row>
           <a-col :span="24">
-            <a-card :bordered="true" style="height: 300px">
+            <a-card :bordered="true" style="height: 250px">
             </a-card>
           </a-col>
         </a-row>
@@ -160,9 +160,10 @@
   import { mixinDevice } from '@/utils/mixin'
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
   import DatabaseInfoModal from './modules/DatabaseInfoModal'
-  import {filterMultiDictText} from '@/components/dict/JDictSelectUtil'
   import ACol from 'ant-design-vue/es/grid/Col'
   import ARow from 'ant-design-vue/es/grid/Row'
+  import { dataManageApi } from '@/api/EmergencyApi.js'
+  import {getAction, postAction} from "@/api/manage";
 
   export default {
     name: 'DatabaseInfoList',
@@ -180,14 +181,52 @@
         showDatabaseVisible: false,
         showType: 'table',
         //选中的单一数据库详细信息 表
-        showDatabaseTableColumns:[],
-        showDatabaseSource:[],
+        showDatabaseTableColumns:[
+          {
+            title: '序号',
+            dataIndex: 'ordinal_position',
+            width:80,
+            align:"center",
+          },
+          {
+            title:'字段英文名',
+            align:"center",
+            dataIndex: 'column_name'
+          },
+          {
+            title:'字段中文名',
+            align:"center",
+            dataIndex: 'column_comment'
+          },
+          {
+            title:'是否可为空',
+            align:"center",
+            dataIndex: 'is_nullable'
+          },
+          {
+            title:'数据类型',
+            align:"center",
+            dataIndex: 'column_type'
+          },
+          {
+            title:'数据键类型',
+            align:"center",
+            width:110,
+            dataIndex: 'column_key'
+          },
+          {
+            title:'有效数据量',
+            align:"center",
+            dataIndex: 'effective_data_volume'
+          },
+        ],
+        showDatabaseTableColumnsInfo:[],
         showDatabaseTableLoading:false,
         //选中的单一数据库详细信息 图
-        // 数据库信息表头
+        // 数据库列表
         columns: [
           {
-            title: '#',
+            title: '序号',
             dataIndex: '',
             key:'rowIndex',
             width:60,
@@ -246,12 +285,6 @@
     created() {
       this.getSuperFieldList();
     },
-    //chart加载函数
-    // mounted(){
-    //   this.$nextTick(()=>{
-    //     this.initData()
-    //   })
-    // },
     computed: {
       importExcelUrl: function(){
         return `${window._CONFIG['domianURL']}/${this.url.importExcelUrl}`;
@@ -272,7 +305,7 @@
       //chart初始化数据
       initData(){
         let option = {
-          title: { text: '在Vue中使用echarts', textStyle: { fontSize: 15 } },
+          title: { text: '字段名称+数据展示', textStyle: { fontSize: 12 } },
           tooltip: {},
           xAxis: {
             data: ["衬衫","羊毛衫","雪纺衫","裤子","高跟鞋","袜子"]
@@ -291,7 +324,14 @@
       //详情事件
       clickDatabaseToShow(record){
         this.showDatabaseVisible = true;
-        console.log(record)
+        const apiUrl = dataManageApi.apiClickDetailTable
+        let tableName = [record.name];
+        postAction(apiUrl,tableName).then((res)=>{
+          if (res.success){
+            this.showDatabaseTableColumnsInfo = res.result
+            console.log(res.result)
+          }
+        })
       },
       //弹出框 表图切换按钮点击事件
       tableClick(){

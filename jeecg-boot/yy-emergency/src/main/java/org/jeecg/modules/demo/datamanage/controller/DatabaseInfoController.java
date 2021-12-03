@@ -49,7 +49,7 @@ import org.jeecg.common.aspect.annotation.AutoLog;
 public class DatabaseInfoController extends JeecgController<DatabaseInfo, IDatabaseInfoService> {
 	@Autowired
 	private IDatabaseInfoService databaseInfoService;
-	
+
 	/**
 	 * 分页列表查询
 	 *
@@ -167,5 +167,10 @@ public class DatabaseInfoController extends JeecgController<DatabaseInfo, IDatab
     public Result<?> importExcel(HttpServletRequest request, HttpServletResponse response) {
         return super.importExcel(request, response, DatabaseInfo.class);
     }
-
+	// 下述为袁野人工编写
+	@RequestMapping(value = "/clickDetailTable", method = RequestMethod.POST)
+	 public Result<?> clickDetailTable(@RequestBody List<String> tableName){
+    	List<Map<String,Object>> tableData = databaseInfoService.selectClickTableData(tableName);
+    	return Result.OK(tableData);
+	}
 }
