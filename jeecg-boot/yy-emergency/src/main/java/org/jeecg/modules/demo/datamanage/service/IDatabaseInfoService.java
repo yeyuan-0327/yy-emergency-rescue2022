@@ -14,4 +14,6 @@ import java.util.Map;
  */
 public interface IDatabaseInfoService extends IService<DatabaseInfo> {
     List<Map<String,Object>> selectClickTableData(List<String> tableName);
+
+    List<Map<String, Object>> selectCharGroupByField(List<String> fieldName);
 }

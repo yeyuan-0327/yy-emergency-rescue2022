@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.jeecg.modules.demo.datamanage.mapper.DatabaseInfoMapper">
+    <!--查询元数据信息-->
     <select id="selectClickTableInfoData" parameterType="java.lang.String" resultType="java.util.HashMap">
         SELECT ordinal_position, column_name, is_nullable, column_type,
         column_key,column_comment
         FROM information_schema.COLUMNS
         WHERE TABLE_SCHEMA = 'dim' AND TABLE_NAME = '${tableName}';
     </select>
-
+    <!--查询表条目数量信息-->
     <select id="selectEffectiveDataVolume" resultType="java.lang.Integer">
         SELECT COUNT(*) FROM dim.${tableName};
+    </select>
+    <select id="selectCharGroupByField" parameterType="java.lang.String" resultType="java.util.HashMap">
+        SELECT ${fName}, COUNT(${fName}) as 'num' FROM dim.dim_hrssb_personal
+        GROUP BY ${fName};
     </select>
 </mapper>

@@ -173,4 +173,11 @@ public class DatabaseInfoController extends JeecgController<DatabaseInfo, IDatab
     	List<Map<String,Object>> tableData = databaseInfoService.selectClickTableData(tableName);
     	return Result.OK(tableData);
 	}
-}
+
+	 @RequestMapping(value = "/selectCharGroupByField", method = RequestMethod.POST)
+	 public Result<?> selectCharGroupByField(@RequestBody List<String> fieldName){
+		 List<Map<String,Object>> fieldData = databaseInfoService.selectCharGroupByField(fieldName);
+		 return Result.OK(fieldData);
+	 }
+
+ }

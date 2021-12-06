@@ -108,21 +108,30 @@
              :width="1400"
              :okButtonProps="{class:{'jee-hidden': true} }"
              cancelText="关闭">
-
-      <a-table v-show="showType === 'table'"
-               bordered
-               :scroll="{ x: 300, y: 300 }"
-               :columns="showDatabaseTableColumns"
-               :dataSource="showDatabaseTableColumnsInfo"
-               :loading="showDatabaseTableLoading">
-        <!--        :pagination="paginationDatabaseOpt"-->
-      </a-table>
+      <div v-show="showType === 'table'">
+        <a-table bordered
+                 :scroll="{ y: 300 }"
+                 :columns="showDatabaseTableColumns"
+                 :dataSource="showDatabaseTableColumnsInfo"
+                 :loading="showDatabaseTableLoading"
+                 rowKey="ordinal_position" >
+          <!--        :pagination="paginationDatabaseOpt"-->
+        </a-table>
+      </div>
 
       <div v-show="showType === 'chart'" >
+        <div>
+          <a-select v-model="defaultOptions"
+                    :options = "columnOptions"
+                    style="width: 120px"
+                    size="small"
+                    @select="columnChange">
+          </a-select>
+        </div>
         <a-row :gutter="16">
           <a-col :span="12">
             <a-card :bordered="false" style="height: 250px">
-              <div id="databaseColumnChart" :style="{width: '650px', height: '280px'}">
+              <div id="myChart" style="width: 650px; height: 270px">
               </div>
             </a-card>
           </a-col>
@@ -164,6 +173,7 @@
   import ARow from 'ant-design-vue/es/grid/Row'
   import { dataManageApi } from '@/api/EmergencyApi.js'
   import {getAction, postAction} from "@/api/manage";
+  import _ from 'lodash'
 
   export default {
     name: 'DatabaseInfoList',
@@ -180,7 +190,7 @@
         showDatabaseVisibleTitle: '标题',
         showDatabaseVisible: false,
         showType: 'table',
-        //选中的单一数据库详细信息 表
+        //选中的单一数据库详细信息表
         showDatabaseTableColumns:[
           {
             title: '序号',
@@ -222,7 +232,12 @@
         ],
         showDatabaseTableColumnsInfo:[],
         showDatabaseTableLoading:false,
-        //选中的单一数据库详细信息 图
+        //选中的单一数据库详细信息图
+        // chart名称
+        fieldChart:null,
+        // 字段选择框
+        columnOptions:[],
+        defaultOptions : "",
         // 数据库列表
         columns: [
           {
@@ -278,8 +293,6 @@
         },
         dictOptions:{},
         superFieldList:[],
-        //chart名称
-        myDatabaseColumnChart:null
       }
     },
     created() {
@@ -303,33 +316,49 @@
         this.superFieldList = fieldList
       },
       //chart初始化数据
-      initData(){
-        let option = {
-          title: { text: '字段名称+数据展示', textStyle: { fontSize: 12 } },
-          tooltip: {},
-          xAxis: {
-            data: ["衬衫","羊毛衫","雪纺衫","裤子","高跟鞋","袜子"]
-          },
-          yAxis: {},
-          series: [{
-            name: '销量',
-            type: 'bar',
-            data: [5, 20, 36, 10, 10, 20]
-          }]
-        };
-        if(this.myDatabaseColumnChart == null) this.myDatabaseColumnChart = this.$echarts.init(document.getElementById('databaseColumnChart'))
-        else this.myDatabaseColumnChart.clear()
-        this.myDatabaseColumnChart.setOption(option,true)
+      drawChart(field){
+        // fieldChart实现
+        let apiUrl = dataManageApi.apiSelectCharGroupByField;
+        let fieldName = [field];
+        postAction(apiUrl,fieldName).then((res)=>{
+          if (res.success){
+            let xData = []
+            let yData = []
+            // 遍历api返回数组
+            _(res.result).forEach(function(i) {
+              xData.push(i[field]);
+              yData.push(i['num']);
+            });
+            // 正式画图
+            const chartOption = {
+              tooltip: {},
+              xAxis: {
+                data: xData
+              },
+              yAxis: {},
+              series: [{
+                name: '统计次数',
+                type: 'bar',
+                data: yData
+              }]
+            };
+            if (this.fieldChart === null) this.fieldChart = this.$echarts.init(document.getElementById('myChart'))
+            else this.fieldChart.clear()
+            this.fieldChart.setOption(chartOption);
+          }
+        })
+
+        //
       },
       //详情事件
       clickDatabaseToShow(record){
         this.showDatabaseVisible = true;
-        const apiUrl = dataManageApi.apiClickDetailTable
+        this.showDatabaseVisibleTitle = record.name;
+        let apiUrl = dataManageApi.apiClickDetailTable
         let tableName = [record.name];
         postAction(apiUrl,tableName).then((res)=>{
           if (res.success){
             this.showDatabaseTableColumnsInfo = res.result
-            console.log(res.result)
           }
         })
       },
@@ -337,7 +366,26 @@
       tableClick(){
       },
       chartClick(){
-        this.initData()
+        // 初始化字段选择器
+        const temp = []
+        _(this.showDatabaseTableColumnsInfo).forEach(function(i) {
+          let disableColumnOption = dataManageApi.disableColumnOption
+          //黑名单判断
+          if(disableColumnOption.indexOf(i['column_name']) === -1){
+            temp.push({
+              value: i['column_name'],
+              label: i['column_comment']
+            })
+          }
+        });
+        this.defaultOptions = temp[0].value;
+        this.columnOptions = temp;
+        // 初始化图表 传入默认第一个字段
+        this.drawChart(this.defaultOptions);
+      },
+      // 改变字段后展示数据图
+      columnChange(value) {
+        this.drawChart(value);
       },
     }
   }

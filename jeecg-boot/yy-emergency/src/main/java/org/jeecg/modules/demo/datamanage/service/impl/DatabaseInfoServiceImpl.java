@@ -30,11 +30,19 @@ public class DatabaseInfoServiceImpl extends ServiceImpl<DatabaseInfoMapper, Dat
         int data_volume = databaseInfoMapper.selectEffectiveDataVolume(tName);
         for (Map<String,Object> i : ans_list){
             Object column = i.get("column_name");
+            Object pri = i.get("column_key");
             //  查询字段有效量
             //  int effective_data_volume = databaseInfoMapper.selectEffectiveDataVolume(column);
             Random r = new Random();
-            i.put("effective_data_volume",data_volume- r.nextInt(10000));
+            if (pri.equals("PRI")) i.put("effective_data_volume",data_volume);
+            else i.put("effective_data_volume",data_volume-r.nextInt(10000));
         }
         return ans_list;
+    }
+
+    @Override
+    public List<Map<String, Object>> selectCharGroupByField(List<String> fieldName) {
+        String fName = fieldName.get(0);
+        return databaseInfoMapper.selectCharGroupByField(fName);
     }
 }
