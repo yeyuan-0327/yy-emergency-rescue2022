@@ -19,5 +19,13 @@ public interface DatabaseInfoMapper extends BaseMapper<DatabaseInfo> {
 
     int selectEffectiveDataVolume(@Param("tableName")String tName);
 
-    List<Map<String, Object>> selectCharGroupByField(@Param("fName")String fName);
+    List<Map<String, Object>> selectCharGroupByField(@Param("fName")String fName,
+                                                     @Param("table")String table);
+
+    List<Map<String, Object>> selectCharGroupByBirthField(@Param("fName")String fName,
+                                                          @Param("table")String table);
+
+    List<Map<String, Object>> selectCharGroupByAnyField(@Param("field")String field,
+                                                        @Param("table")String table,
+                                                        @Param("groupField")String groupField);
 }

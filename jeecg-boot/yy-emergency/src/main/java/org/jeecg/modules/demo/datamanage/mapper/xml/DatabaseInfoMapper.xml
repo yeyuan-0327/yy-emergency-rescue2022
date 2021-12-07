@@ -13,7 +13,21 @@
         SELECT COUNT(*) FROM dim.${tableName};
     </select>
     <select id="selectCharGroupByField" parameterType="java.lang.String" resultType="java.util.HashMap">
-        SELECT ${fName}, COUNT(${fName}) as 'num' FROM dim.dim_hrssb_personal
+        SELECT ${fName}, COUNT(${fName}) as 'num' FROM dim.${table}
         GROUP BY ${fName};
+    </select>
+
+    <select id="selectCharGroupByBirthField" parameterType="java.lang.String" resultType="java.util.HashMap">
+        SELECT YEAR(birth) as 'year', ${fName}, COUNT(${fName})as 'count'
+        FROM dim.${table}
+        GROUP BY ${fName},YEAR(birth)
+        ORDER BY year desc, ${fName};
+    </select>
+
+    <select id="selectCharGroupByAnyField" parameterType="java.lang.String" resultType="java.util.HashMap">
+        SELECT ${field},${groupField}, COUNT(${field}) as 'count'
+        FROM dim.${table}
+        GROUP BY ${field},${groupField}
+        ORDER BY ${groupField};
     </select>
 </mapper>

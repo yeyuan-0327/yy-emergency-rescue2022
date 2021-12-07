@@ -1,5 +1,6 @@
 package org.jeecg.modules.demo.datamanage.controller;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -179,5 +180,37 @@ public class DatabaseInfoController extends JeecgController<DatabaseInfo, IDatab
 		 List<Map<String,Object>> fieldData = databaseInfoService.selectCharGroupByField(fieldName);
 		 return Result.OK(fieldData);
 	 }
+	 @RequestMapping(value = "/selectCharGroupByBirthField", method = RequestMethod.POST)
+	 public Result<?> selectCharGroupByBirthField(@RequestBody List<String> fieldName){
+		 List<List<Object>> fieldData = databaseInfoService.selectCharGroupByBirthField(fieldName);
+		 return Result.OK(fieldData);
+	 }
 
+	 @RequestMapping(value = "/selectCharGroupByAnyField", method = RequestMethod.POST)
+	 public Result<?> selectCharGroupByAnyField(@RequestBody List<String> fieldTableList){
+		 List<Map<String,Object>> fieldData = databaseInfoService.selectCharGroupByAnyField(fieldTableList);
+		 return Result.OK(fieldData);
+	 }
+
+	 @GetMapping(value = "/echartsTest")
+	 public Result<?> echartsTest() {
+		 List<List<Object>> res = new ArrayList<>();
+		 List<Object> temp = Arrays.asList("Income","Life Expectancy","Population","Country","Year");
+		 res.add(temp);
+		 List<String> c = Arrays.asList("Finland",
+				 "France",
+				 "Germany",
+				 "Iceland",
+				 "Norway",
+				 "Poland",
+				 "Russia",
+				 "United Kingdom");
+		 for (int year=1800;year < 2021;year++){
+			 for (String i : c){
+				 List<Object> temp1 = Arrays.asList(Math.random()*1000,34.05,351014,i,year);
+				 res.add(temp1);
+			 }
+		 }
+		 return Result.OK(res);
+	 }
  }

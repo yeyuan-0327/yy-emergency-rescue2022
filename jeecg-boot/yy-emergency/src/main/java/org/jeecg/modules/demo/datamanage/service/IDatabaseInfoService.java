@@ -16,4 +16,8 @@ public interface IDatabaseInfoService extends IService<DatabaseInfo> {
     List<Map<String,Object>> selectClickTableData(List<String> tableName);
 
     List<Map<String, Object>> selectCharGroupByField(List<String> fieldName);
+
+    List<List<Object>> selectCharGroupByBirthField(List<String> fieldName);
+
+    List<Map<String, Object>> selectCharGroupByAnyField(List<String> fieldTableName);
 }

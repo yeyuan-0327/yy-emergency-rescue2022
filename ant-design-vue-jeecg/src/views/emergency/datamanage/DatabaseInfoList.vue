@@ -120,31 +120,37 @@
       </div>
 
       <div v-show="showType === 'chart'" >
-        <div>
-          <a-select v-model="defaultOptions"
-                    :options = "columnOptions"
-                    style="width: 120px"
-                    size="small"
-                    @select="columnChange">
-          </a-select>
-        </div>
         <a-row :gutter="16">
           <a-col :span="12">
-            <a-card :bordered="false" style="height: 250px">
-              <div id="myChart" style="width: 650px; height: 270px">
+            <div>
+              <a-select v-model="defaultOptions"
+                        :options = "columnOptions"
+                        style="width: 120px"
+                        size="small"
+                        @select="columnChange">
+              </a-select>
+            </div>
+              <div id="fieldChart" style="width: 100%; height: 400px">
               </div>
-            </a-card>
           </a-col>
           <a-col :span="12">
-            <a-card :bordered="true" style="height: 250px">
-            </a-card>
+            <div>
+              <a-select v-model="defaultOptionsSecond"
+                        :options = "columnOptionsSecond"
+                        style="width: 120px"
+                        size="small"
+                        @select="columnChangeSecond">
+              </a-select>
+            </div>
+              <div id="sexChart" style="width: 600px; height: 400px">
+              </div>
           </a-col>
         </a-row>
         <br/>
         <a-row>
           <a-col :span="24">
-            <a-card :bordered="true" style="height: 250px">
-            </a-card>
+              <div id="birthChart" style="width: 100%; height: 300px">
+              </div>
           </a-col>
         </a-row>
       </div>
@@ -172,8 +178,9 @@
   import ACol from 'ant-design-vue/es/grid/Col'
   import ARow from 'ant-design-vue/es/grid/Row'
   import { dataManageApi } from '@/api/EmergencyApi.js'
-  import {getAction, postAction} from "@/api/manage";
+  import { postAction } from '@/api/manage'
   import _ from 'lodash'
+  import * as echarts from 'echarts'
 
   export default {
     name: 'DatabaseInfoList',
@@ -232,12 +239,15 @@
         ],
         showDatabaseTableColumnsInfo:[],
         showDatabaseTableLoading:false,
-        //选中的单一数据库详细信息图
-        // chart名称
-        fieldChart:null,
+        //选中的单一数据库详细信息 图
+        birthXField:[],
+        fChart:null,
+        bChart:null,
         // 字段选择框
         columnOptions:[],
+        columnOptionsSecond:[],
         defaultOptions : "",
+        defaultOptionsSecond:"",
         // 数据库列表
         columns: [
           {
@@ -316,39 +326,218 @@
         this.superFieldList = fieldList
       },
       //chart初始化数据
-      drawChart(field){
-        // fieldChart实现
+      drawChart(field,fieldSecond){
+        // 左上角图
         let apiUrl = dataManageApi.apiSelectCharGroupByField;
-        let fieldName = [field];
-        postAction(apiUrl,fieldName).then((res)=>{
+        let fieldTableList = [field,this.showDatabaseVisibleTitle];
+        postAction(apiUrl,fieldTableList).then((res)=>{
           if (res.success){
-            let xData = []
-            let yData = []
-            // 遍历api返回数组
-            _(res.result).forEach(function(i) {
-              xData.push(i[field]);
-              yData.push(i['num']);
-            });
-            // 正式画图
-            const chartOption = {
-              tooltip: {},
-              xAxis: {
-                data: xData
-              },
-              yAxis: {},
-              series: [{
-                name: '统计次数',
-                type: 'bar',
-                data: yData
-              }]
-            };
-            if (this.fieldChart === null) this.fieldChart = this.$echarts.init(document.getElementById('myChart'))
-            else this.fieldChart.clear()
-            this.fieldChart.setOption(chartOption);
+            drawBarChart(res.result)
+            function drawBarChart(_barData){
+              let xData = []
+              let yData = []
+              // 遍历api返回数组
+              _(_barData).forEach(function(i) {
+                xData.push(i[field]);
+                yData.push(i['num']);
+              });
+              // 画左上角图
+              const fieldChartOption = {
+                tooltip: {},
+                xAxis: {
+                  axisLabel:{
+                    interval: 0,
+                    rotate:25
+                  },
+                  data: xData
+                },
+                yAxis: {},
+                series: [{
+                  name: '统计次数',
+                  type: 'bar',
+                  data: yData
+                }]
+              };
+              if (document.getElementById('fieldChart') != null) echarts.dispose(document.getElementById('fieldChart'))
+              let fieldChart = echarts.init(document.getElementById('fieldChart'))
+              fieldChart.setOption(fieldChartOption,true);
+            }
+          }
+        })
+        // 右上角图
+        apiUrl = dataManageApi.selectCharGroupBySexField;
+        fieldTableList = [field,this.showDatabaseVisibleTitle,fieldSecond]
+        postAction(apiUrl,fieldTableList).then((res)=>{
+          if (res.success){
+            drawPie(_.last(res.result), _.initial(res.result))
+            function drawPie(innerPieData,outPieData) {
+              let innerData = []
+              _.forEach(innerPieData,function(value,key) {
+                innerData.push(
+                  { value:value,name:key }
+                )
+              })
+              let outData = []
+              _.forEach(outPieData,function(value) {
+                outData.push({
+                  value:value['count'],
+                  name:value[field]+value[fieldSecond]
+                })
+              })
+              let sexOption = {
+                tooltip: {
+                },
+                series: [
+                  {
+                    name: '数量',
+                    type: 'pie',
+                    center:'50%',
+                    selectedMode: 'single',
+                    radius: '30%',
+                    label: {
+                      position: 'inner',
+                      fontSize: 14
+                    },
+                    labelLine: {
+                    },
+                    data: innerData
+                  },
+                  {
+                    name: '统计数量',
+                    type: 'pie',
+                    center:'50%',
+                    radius: ['50%', '65%'],
+                    labelLine: {
+                      length: 20
+                    },
+                    label: {
+                      rich: {
+                        a: {
+                          color: '#6E7079',
+                          lineHeight: 22,
+                          align: 'center'
+                        },
+                        hr: {
+                          borderColor: '#8C8D8E',
+                          width: '100%',
+                          borderWidth: 1,
+                          height: 0
+                        },
+                        b: {
+                          color: '#4C5058',
+                          fontSize: 14,
+                          fontWeight: 'bold',
+                          lineHeight: 33
+                        },
+                        per: {
+                          color: '#fff',
+                          backgroundColor: '#4C5058',
+                          padding: [3, 4],
+                          borderRadius: 4
+                        }
+                      }
+                    },
+                    data: outData
+                  }
+                ]
+              };
+              if (document.getElementById('sexChart') != null)echarts.dispose(document.getElementById('sexChart'))
+              let sexChart = echarts.init(document.getElementById('sexChart'))
+              sexChart.setOption(sexOption);
+            }
           }
         })
 
-        //
+        // 正下方图
+        apiUrl = dataManageApi.selectCharGroupByBirthField;
+        fieldTableList = [field,this.showDatabaseVisibleTitle];
+        postAction(apiUrl,fieldTableList).then((res)=>{
+          if (res.success) {
+            if (res.success) {
+              let resData = res.result
+              drawBirthLine(_.tail(resData))
+              //画正下方图
+              function drawBirthLine(_rawData) {
+                const fields = resData[0];
+                const datasetWithFilters = [];
+                const seriesList = [];
+                echarts.util.each(fields, function (field) {
+                  const datasetId = 'dataset_' + field;
+                  datasetWithFilters.push({
+                    id: datasetId,
+                    fromDatasetId: 'dataset_raw',
+                    transform: {
+                      type: 'filter',
+                      config: {
+                        and: [
+                          { dimension: 'Year', gte: 18 },
+                          { dimension: 'Field', '=': field }
+                        ]
+                      }
+                    }
+                  });
+                  seriesList.push({
+                    type: 'line',
+                    datasetId: datasetId,
+                    showSymbol: false,
+                    name: field,
+                    endLabel: {
+                      show: true,
+                      formatter: function (params) {
+                        return params.value[1] + ': ' + params.value[0];
+                      }
+                    },
+                    labelLayout: {
+                      moveOverlap: 'shiftY'
+                    },
+                    emphasis: {
+                      focus: 'series'
+                    },
+                    encode: {
+                      x: 'Year',
+                      y: 'Count',
+                      label: ['Field', 'Count'],
+                      itemName: 'Year',
+                      tooltip: ['Count']
+                    }
+                  });
+                });
+                const birthChartOption = {
+                  animationDuration: 10000,
+                  dataset: [
+                    {
+                      id: 'dataset_raw',
+                      source: _rawData
+                    },
+                    ...datasetWithFilters
+                  ],
+                  title: {
+                    text: '随着年龄段变化趋势'
+                  },
+                  tooltip: {
+                    order: 'valueDesc',
+                    trigger: 'axis'
+                  },
+                  xAxis: {
+                    type: 'category',
+                    nameLocation: 'middle'
+                  },
+                  yAxis: {
+                    name: '统计个数'
+                  },
+                  grid: {
+                    right: 140
+                  },
+                  series: seriesList
+                };
+                if (document.getElementById('birthChart') != null) echarts.dispose(document.getElementById('birthChart'))
+                let birthChart = echarts.init(document.getElementById('birthChart'))
+                birthChart.setOption(birthChartOption,true);
+              }
+            }
+          }
+        })
+
       },
       //详情事件
       clickDatabaseToShow(record){
@@ -380,12 +569,19 @@
         });
         this.defaultOptions = temp[0].value;
         this.columnOptions = temp;
+        this.columnOptionsSecond = temp;
+        this.defaultOptionsSecond = this.columnOptionsSecond[1].value
         // 初始化图表 传入默认第一个字段
-        this.drawChart(this.defaultOptions);
+        this.drawChart(this.defaultOptions,this.defaultOptionsSecond);
       },
       // 改变字段后展示数据图
       columnChange(value) {
-        this.drawChart(value);
+        this.defaultOptions=value;
+        this.drawChart(value,this.defaultOptionsSecond);
+      },
+      columnChangeSecond(value) {
+        this.defaultOptionsSecond = value
+        this.drawChart(this.defaultOptions,value);
       },
     }
   }
