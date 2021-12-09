@@ -1,11 +1,13 @@
 <template>
   <a-card :bordered="false">
     <a-modal v-model="dwRelationshipModal"
-             :title="dwRelationshipModalTitle"
+             :title="dwRelationshipModalChineseTitle"
              switchFullscreen
              :width="1400"
              :okButtonProps="{class:{'jee-hidden': true} }"
              cancelText="关闭">
+
+      <div v-show="showType === 'table'" >
       <a-table bordered
                :scroll="{ x:10000, y: 400 }"
                :columns="factTableColumns"
@@ -13,11 +15,33 @@
                :loading="factTableLoading"
                rowKey="item_id"
                :pagination="paginationOpt">
-
       </a-table>
+      </div>
+      <div v-show="showType === 'chart'" >
+        <a-row :gutter="16">
+          <a-col :span="12">
+            <div>
+              <a-select v-model="defaultFieldOptions"
+                        :options = "fieldOptions"
+                        style="width: 120px"
+                        size="small"
+                        @select="columnChangeSelect">
+              </a-select>
+            </div>
+            <div id="factChart" style="width: 1300px; height: 500px">
+            </div>
+          </a-col>
+        </a-row>
+      </div>
+
+      <a-radio-group v-model="showType">
+        <a-radio-button value="chart" @click="chartClick()">
+          数据说明图
+        </a-radio-button>
+      </a-radio-group>
 
     </a-modal>
-    <div id="myChart" style="width: 100%; height: 800px">
+    <div id="myChart" style="width: 100%; height: 1000px">
     </div>
   </a-card>
 </template>
@@ -29,15 +53,20 @@
   import _ from 'lodash'
 
   export default {
-    name: 'EchartTest',
+    name: 'DwRelationChart',
     data(){
       return{
-        dwRelationshipModalTitle:'',
+        dwRelationshipModalChineseTitle:'',
         dwRelationshipModal:false,
-        myChart:null,
+        // 表
         factTableColumns:[],
         factTableData: [],
         factTableLoading:false,
+        factTable: '',
+        showType: "table",
+        // 字段选择框
+        defaultFieldOptions:"",
+        fieldOptions:[],
         //数据分页设置
         paginationOpt: {
           defaultCurrent: 1, // 默认当前页数
@@ -171,9 +200,12 @@
         })
       },
       dwModal(data){
+        this.showType = "table"
         this.dwRelationshipModal = true
-        this.dwRelationshipModalTitle=data.name;
-        let postList = [data.value]
+        this.dwRelationshipModalChineseTitle = data.name;
+        let tableName = data.value
+        this.factTable = tableName
+        let postList = [tableName]
         let apiUrl = dataManageApi.fetchDwData
         postAction(apiUrl,postList).then((res)=>{
           if (res.success){
@@ -210,13 +242,76 @@
             this.factTableData = temp_data
           }
         })
+      },
+      chartClick(){
+        // 初始化字段选择器
+        let temp = []
+        _(this.factTableColumns).forEach(function(i) {
+          let disableColumnOption = dataManageApi.disableColumnOption
+          //黑名单判断
+          if(disableColumnOption.indexOf(i['key']) === -1){
+            temp.push({
+              value: i['key'],
+              label: i['title']
+            })
+          }
+        });
+        temp = _.tail(temp)
+        this.defaultFieldOptions = temp[0].value;
+        this.fieldOptions = temp;
+        this.drawFactChart(this.defaultFieldOptions)
+      },
+      columnChangeSelect(value){
+        this.drawFactChart(value)
+      },
+      drawFactChart(field){
+        if (document.getElementById('factChart') != null) echarts.dispose(document.getElementById('factChart'))
+        let factChart = echarts.init(document.getElementById('factChart'));
+        factChart.showLoading();
+        let apiUrl = dataManageApi.factDataTable
+        let postList = [field,this.factTable]
+        postAction(apiUrl,postList).then((res)=>{
+          if (res.success){
+            drawBarChart(res.result)
+            function drawBarChart(_barData) {
+              let xData = []
+              let yData = []
+              // 遍历api返回数组
+              _(_barData).forEach(function(i) {
+                xData.push(i[field]);
+                yData.push(i['count']);
+              });
+              // 指定图表的配置项和数据
+              let option = {
+                tooltip: {},
+                yAxis: {
+                  axisLabel:{
+                    interval: 0,
+                    rotate:25
+                  },
+                  data: xData
+                },
+                xAxis: {
+                },
+                series: [
+                  {
+                    data: yData,
+                    type: 'bar'
+                  }
+                ]
+              }
+              // 使用刚指定的配置项和数据显示图表。
+              factChart.hideLoading();
+              factChart.setOption(option,true);
+            }
+          }
+        })
       }
     },
   }
-
 </script>
 
-<style>
+<style scoped>
   #components-popover-demo-placement .ant-btn {
     width: 70px;
     text-align: center;

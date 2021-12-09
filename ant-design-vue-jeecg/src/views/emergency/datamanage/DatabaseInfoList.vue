@@ -103,7 +103,7 @@
       </a-table>
     </div>
     <a-modal v-model="showDatabaseVisible"
-             :title="showDatabaseVisibleTitle"
+             :title="showDatabaseVisibleChineseTitle"
              switchFullscreen
              :width="1400"
              :okButtonProps="{class:{'jee-hidden': true} }"
@@ -194,7 +194,8 @@
       return {
         description: '基础数据库信息表管理页面',
         //弹出框
-        showDatabaseVisibleTitle: '标题',
+        showDatabaseVisibleTitle: '',
+        showDatabaseVisibleChineseTitle: '标题',
         showDatabaseVisible: false,
         showType: 'table',
         //选中的单一数据库详细信息表
@@ -470,7 +471,7 @@
                       type: 'filter',
                       config: {
                         and: [
-                          { dimension: 'Year', gte: 18 },
+                          { dimension: 'Year', gte: 1 },
                           { dimension: 'Field', '=': field }
                         ]
                       }
@@ -543,6 +544,7 @@
       clickDatabaseToShow(record){
         this.showDatabaseVisible = true;
         this.showDatabaseVisibleTitle = record.name;
+        this.showDatabaseVisibleChineseTitle = record.chineseName;
         let apiUrl = dataManageApi.apiClickDetailTable
         let tableName = [record.name];
         postAction(apiUrl,tableName).then((res)=>{

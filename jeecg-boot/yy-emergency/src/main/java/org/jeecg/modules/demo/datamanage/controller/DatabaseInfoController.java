@@ -192,6 +192,23 @@ public class DatabaseInfoController extends JeecgController<DatabaseInfo, IDatab
 		 return Result.OK(fieldData);
 	 }
 
+	 @GetMapping(value = "/fetchDimFactRelation")
+	 public Result<?> fetchDimFactRelation(){
+		 List<Map<String,Object>> res = databaseInfoService.fetchDimFactRelation();
+    	return Result.OK(res);
+	 }
+
+	 @RequestMapping(value = "/fetchDwData", method = RequestMethod.POST)
+	 public Result<?> fetchDwData(@RequestBody List<String> postList){
+		 List<List<Map<String, Object>>> res = databaseInfoService.fetchDwData(postList);
+    	return Result.OK(res);
+	 }
+	 @RequestMapping(value = "/factDataTable", method = RequestMethod.POST)
+	 public Result<?> factDataTable(@RequestBody List<String> postList){
+		 List<Map<String, Object>> res = databaseInfoService.factDataTable(postList);
+		 return Result.OK(res);
+	 }
+
 	 @GetMapping(value = "/echartsTest")
 	 public Result<?> echartsTest() {
 		 List<List<Object>> res = new ArrayList<>();

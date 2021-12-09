@@ -20,4 +20,10 @@ public interface IDatabaseInfoService extends IService<DatabaseInfo> {
     List<List<Object>> selectCharGroupByBirthField(List<String> fieldName);
 
     List<Map<String, Object>> selectCharGroupByAnyField(List<String> fieldTableName);
+
+    List<Map<String, Object>> fetchDimFactRelation();
+
+    List<List<Map<String, Object>>> fetchDwData(List<String> postList);
+
+    List<Map<String, Object>> factDataTable(List<String> postList);
 }

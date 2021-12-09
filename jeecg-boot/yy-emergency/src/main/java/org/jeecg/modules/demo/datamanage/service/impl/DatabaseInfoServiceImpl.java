@@ -92,4 +92,35 @@ public class DatabaseInfoServiceImpl extends ServiceImpl<DatabaseInfoMapper, Dat
         res.add(sumField);
         return res;
     }
+
+    @Override
+    public List<Map<String, Object>> fetchDimFactRelation() {
+        List<Map<String, Object>> fact_data_list = databaseInfoMapper.fetchDimFactRelationPointFact();
+        List<Map<String, Object>> dim_data_list = databaseInfoMapper.fetchDimFactRelationPointDim();
+        List<Map<String, Object>> link_list = databaseInfoMapper.fetchDimFactRelationLink();
+        List<Map<String, Object>> res = new ArrayList<>();
+        res.addAll(fact_data_list);
+        res.addAll(dim_data_list);
+        res.addAll(link_list);
+        return res;
+    }
+
+    @Override
+    public List<List<Map<String, Object>>> fetchDwData(List<String> postList) {
+        String table_name = postList.get(0);
+        List<Map<String, Object>> column = databaseInfoMapper.fetchDwDataColumn(table_name);
+        List<Map<String, Object>> data = databaseInfoMapper.fetchDwData(table_name);
+        List<List<Map<String, Object>>> res = new ArrayList<>();
+        res.add(column);
+        res.add(data);
+        return res;
+    }
+
+    @Override
+    public List<Map<String, Object>> factDataTable(List<String> postList) {
+        String field = postList.get(0);
+        String table_name = postList.get(1);
+        List<Map<String, Object>> res = databaseInfoMapper.factDataTable(field, table_name);
+        return res;
+    }
 }

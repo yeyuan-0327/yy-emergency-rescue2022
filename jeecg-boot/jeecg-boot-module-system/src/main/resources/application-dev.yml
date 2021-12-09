@@ -118,7 +118,7 @@ spring:
         timeBetweenEvictionRunsMillis: 60000
         # 配置一个连接在池中最小生存的时间，单位是毫秒
         minEvictableIdleTimeMillis: 300000
-        validationQuery: SELECT 1 FROM DUAL
+#        validationQuery: SELECT 1 FROM DUAL
         testWhileIdle: true
         testOnBorrow: false
         testOnReturn: false
@@ -141,6 +141,11 @@ spring:
           #username: root
           #password: root
           #driver-class-name: com.mysql.cj.jdbc.Driver
+        dw-gp:
+          url: jdbc:postgresql://192.168.101.105:15432/postgis?currentSchema=public
+          username: gpadmin
+          password: gpadmin
+          driver-class-name: org.postgresql.Driver
   #redis 配置
   redis:
     database: 0

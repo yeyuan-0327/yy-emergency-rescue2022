@@ -30,4 +30,62 @@
         GROUP BY ${field},${groupField}
         ORDER BY ${groupField};
     </select>
+
+    <select id="fetchDimFactRelationPointFact" parameterType="java.lang.String" resultType="java.util.HashMap">
+        SELECT name as 'value',
+        chinese_name as 'name','fact' as 'type',
+        CONCAT('字段数量:',field_num,
+        ';<![CDATA[<br/>]]>字段描述:',
+        substring(field_des,1,LENGTH(field_des)/4),
+        '<![CDATA[<br/>]]>',
+        substring(field_des,(LENGTH(field_des)/4)+1),
+        ';<![CDATA[<br/>]]>数据量:',volume,';<![CDATA[<br/>]]>表大小:',size,
+        ';<![CDATA[<br/>]]>最后更新时间',last_update_time) as des
+        FROM fact_table;
+    </select>
+
+    <select id="fetchDimFactRelationPointDim" parameterType="java.lang.String" resultType="java.util.HashMap">
+        SELECT name as 'value',
+        chinese_name as 'name','dim' as 'type',
+        CONCAT('字段数量:',field_num,
+        ';<![CDATA[<br/>]]>字段描述:',
+        substring(field_des,1,LENGTH(field_des)/4),
+        '<![CDATA[<br/>]]>',
+        substring(field_des,(LENGTH(field_des)/4)+1),
+        ';<![CDATA[<br/>]]>数据量:',volume,
+        ';<![CDATA[<br/>]]>表大小:',size,
+        ';<![CDATA[<br/>]]>最后更新时间',last_update_time) as des
+        FROM dim_table;
+    </select>
+
+    <select id="fetchDimFactRelationLink" parameterType="java.lang.String" resultType="java.util.HashMap">
+        SELECT d.chinese_name as 'source','relation' as 'type',
+        f.chinese_name as 'target'
+        FROM dim_table as d,fact_table as f
+        WHERE d.reletion_fact=f.name;
+    </select>
+
+    <select id="fetchDwDataColumn" parameterType="java.lang.String" resultType="java.util.HashMap">
+        select
+        a.attname AS "dataIndex",
+        d.description AS "title"
+        from pg_class c, pg_attribute a , pg_type t, pg_description d
+        where  c.relname = '${table}'
+        and a.attnum > 0
+        and a.attrelid = c.oid
+        and a.atttypid = t.oid
+        and  d.objoid=a.attrelid
+        and d.objsubid=a.attnum
+        ORDER BY c.relname DESC,a.attnum ASC
+    </select>
+
+    <select id="fetchDwData" parameterType="java.lang.String" resultType="java.util.HashMap">
+        SELECT * FROM ${table} LIMIT 1000;
+    </select>
+
+    <select id="factDataTable" parameterType="java.lang.String" resultType="java.util.HashMap">
+        SELECT ${field},COUNT(${field})
+        FROM ${table}
+        GROUP BY ${field};
+    </select>
 </mapper>
