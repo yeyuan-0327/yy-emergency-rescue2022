@@ -14,7 +14,7 @@
     },
     methods: {
       hello () {
-        var url = "/test/jeecgDemoModel/hello"
+        let url = "/test/jeecgDemoModel/hello"
         getAction(url).then((res) => {
           if (res.success) {
             this.msg = res.result;
