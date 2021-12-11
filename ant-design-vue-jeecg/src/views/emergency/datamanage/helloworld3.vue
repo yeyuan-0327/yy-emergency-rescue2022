@@ -14,10 +14,11 @@
     },
     methods: {
       hello () {
-        let url = "/test/jeecgDemoModel/hello"
+        let url = "/ruleSet/jarInfoCheck"
         getAction(url).then((res) => {
           if (res.success) {
             this.msg = res.result;
+            console.log(res.result)
           }
         })
       }

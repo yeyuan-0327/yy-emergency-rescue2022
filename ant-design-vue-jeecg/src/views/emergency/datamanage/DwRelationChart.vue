@@ -141,7 +141,10 @@
                 }
               })
               let option = {
-                title: { text: '数据仓库关系图谱' },
+                title: { text: '数据仓库关系图谱',textStyle:{
+                  fontSize:20
+                  }
+                },
                 tooltip: {
                   formatter: function (x) {
                     return x.data.des;
