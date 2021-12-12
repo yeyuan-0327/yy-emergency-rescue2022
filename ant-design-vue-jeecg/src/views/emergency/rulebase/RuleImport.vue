@@ -12,9 +12,9 @@
             src="@/assets/drools.png"
           />
           <template slot="actions" class="ant-card-actions">
-              <a-icon key="edit" type="edit" @click="editClick"/>
+              <a-icon key="edit" type="edit" @click="jarEditClick"/>
           </template>
-          <a-card-meta title=".Jar接口" description="通过Jar链接引入规则">
+          <a-card-meta title="Jar接口" description="通过Jar链接引入规则">
           </a-card-meta>
         </a-card>
 <!--        xls文件-->
@@ -25,9 +25,9 @@
             src="@/assets/excel.png"
           />
           <template slot="actions" class="ant-card-actions">
-            <a-icon key="edit" type="edit" @click="editClick"/>
+            <a-icon key="edit" type="edit" @click="excelEditClick"/>
           </template>
-          <a-card-meta title=".Xls文件" description="通过Excel文件引入规则">
+          <a-card-meta title="Excel文件" description="通过Excel文件引入规则">
           </a-card-meta>
         </a-card>
 <!--        drl文件-->
@@ -40,7 +40,7 @@
           <template slot="actions" class="ant-card-actions">
             <a-icon key="edit" type="edit" @click="editClick"/>
           </template>
-          <a-card-meta title=".Drl文件" description="通过Drl文件引入规则">
+          <a-card-meta title="Drl文件" description="通过Drl文件引入规则">
           </a-card-meta>
         </a-card>
       </a-space>
@@ -59,7 +59,7 @@
         :label-col="labelCol"
         :wrapper-col="wrapperCol"
       >
-        <a-form-model-item ref="name" label="Activity name" prop="name">
+        <a-form-model-item ref="name" label="规则名称" prop="name">
           <a-input
             v-model="form.name"
             @blur="
@@ -69,56 +69,69 @@
         "
           />
         </a-form-model-item>
-        <a-form-model-item label="Activity zone" prop="region">
-          <a-select v-model="form.region" placeholder="please select your zone">
-            <a-select-option value="shanghai">
-              Zone one
+        <a-form-model-item label="所属险情" prop="emergency_type">
+          <a-select v-model="form.emergency_type" placeholder="请输入该规则的归属险情类别">
+<!--        预留接口 可以从接口中获取到险情类别-->
+            <a-select-option value="socialEmergency">
+              社会动员
             </a-select-option>
-            <a-select-option value="beijing">
-              Zone two
+            <a-select-option value="peopleSettlement">
+              人员安置
+            </a-select-option>
+            <a-select-option value="peopleRescue">
+              人员搜救
             </a-select-option>
           </a-select>
         </a-form-model-item>
-        <a-form-model-item label="Activity time" required prop="date1">
+        <a-form-model-item label="失效时间" required prop="invalid_date">
           <a-date-picker
-            v-model="form.date1"
-            show-time
+            v-model="form.invalid_date"
             type="date"
-            placeholder="Pick a date"
+            placeholder="创建规则成功后则生效"
             style="width: 100%;"
+            :disabledDate="disabledDate"
           />
         </a-form-model-item>
-        <a-form-model-item label="Instant delivery" prop="delivery">
-          <a-switch v-model="form.delivery" />
+        <a-form-model-item label="规则类型" >
+          <a-button v-show="ruleType==='Jar'" disabled>
+            Jar
+          </a-button>
+          <a-space v-show="ruleType==='Excel'">
+            <a-button  disabled>
+              Excel
+            </a-button>
+            <a-button @click="downloadExcelFile">
+              <a-icon type="download" />
+              <a :href="url.downloadUrl" download="模版文件.xlsx">模版文件</a>
+            </a-button>
+          </a-space>
+
+          <a-button v-show="ruleType==='Drl'" disabled>
+            Drl
+          </a-button>
         </a-form-model-item>
-        <a-form-model-item label="Activity type" prop="type">
-          <a-checkbox-group v-model="form.type">
-            <a-checkbox value="1" name="type">
-              Online
-            </a-checkbox>
-            <a-checkbox value="2" name="type">
-              Promotion
-            </a-checkbox>
-            <a-checkbox value="3" name="type">
-              Offline
-            </a-checkbox>
-          </a-checkbox-group>
+<!--        规则类型为Jar显示-->
+        <a-form-model-item
+          v-show="ruleType==='Jar'"
+          ref="resource"  label="规则链接" prop="resource">
+          <a-input-search @search="onRuleMetaSearch" v-model="form.resource"
+                          @blur="() => {$refs.resource.onFieldBlur();}">
+            <a-button v-if="form.resource === ''" slot="enterButton" type="primary" icon="search" disabled>
+            </a-button>
+            <a-button v-else slot="enterButton" type="primary" icon="search">
+            </a-button>
+          </a-input-search>
         </a-form-model-item>
-        <a-form-model-item label="Resources" prop="resource">
-          <a-radio-group v-model="form.resource">
-            <a-radio value="1">
-              Sponsor
-            </a-radio>
-            <a-radio value="2">
-              Venue
-            </a-radio>
-          </a-radio-group>
+<!--        -->
+
+
+
+        <a-form-model-item v-if="form.meta !== ''" label="规则详情" prop="meta" required>
+          <a-input v-model="form.meta" type="textarea" disabled />
         </a-form-model-item>
-        <a-form-model-item label="Activity form" prop="desc">
-          <a-input v-model="form.desc" type="textarea" />
-        </a-form-model-item>
+
         <a-form-model-item :wrapper-col="{ span: 14, offset: 4 }">
-          <a-button type="primary" @click="onSubmit">
+          <a-button @click="onRuleCheck" >
             验证
           </a-button>
           <a-button style="margin-left: 10px;" @click="resetForm">
@@ -133,9 +146,11 @@
 <script>
   import {getAction, postAction} from "@/api/manage";
   import { dataManageApi } from '@/api/EmergencyApi.js'
-
+  import AInputSearch from 'ant-design-vue/es/input/Search'
+  import moment from 'moment'
   export default {
     name: 'RuleImport',
+    components: { AInputSearch },
     data () {
       return {
         ruleWriteModal:false,
@@ -146,63 +161,122 @@
         labelCol: { span: 4 },
         wrapperCol: { span: 14 },
         other: '',
+        // 规则类型
+        ruleType: '',
         form: {
           name: '',
-          region: undefined,
-          date1: undefined,
-          delivery: false,
-          type: [],
+          emergency_type: undefined,
+          invalid_date: undefined,
           resource: '',
-          desc: '',
+          meta: ''
         },
         rules: {
           name: [
-            { required: true, message: 'Please input Activity name', trigger: 'blur' },
-            { min: 3, max: 5, message: 'Length should be 3 to 5', trigger: 'blur' },
+            { required: true, message: '请输入规则名称', trigger: 'blur' },
+            { min: 2, max: 10, message: '长度应该在2到10之间', trigger: 'blur' },
           ],
-          region: [{ required: true, message: 'Please select Activity zone', trigger: 'change' }],
-          date1: [{ required: true, message: 'Please pick a date', trigger: 'change' }],
-          type: [
-            {
-              type: 'array',
-              required: true,
-              message: 'Please select at least one activity type',
-              trigger: 'change',
-            },
-          ],
+          emergency_type: [{ required: true, message: '请选择所属险情类别', trigger: 'change' }],
+          invalid_date: [{ required: true, message: '请选择失效时间', trigger: 'change' }],
           resource: [
-            { required: true, message: 'Please select activity resource', trigger: 'change' },
+            { required: true, message: '请填入规则链接', trigger: 'blur' },
           ],
-          desc: [{ required: true, message: 'Please input activity form', trigger: 'blur' }],
+          meta: [
+            { required: true, message: '请点击搜索按钮', trigger: 'blur' },
+          ],
+        },
+        // excel模版文件地址
+        url: {
+          downloadUrl: 'insuranceInfoCheck.xls',
         },
       }
     },
     methods: {
-      editClick(){
-        this.ruleWriteModalTitle = ".Jar接口"
+      moment,
+      jarEditClick(){
+        this.ruleWriteModalTitle = "Jar接口"
+        this.ruleType = 'Jar';
         this.ruleWriteModal = true
+        // 清空规则内容，使之不断重现加载
+        this.form.meta = ''
       },
-      ruleWriteOk(e) {
-        this.confirmLoading = true;
-        setTimeout(() => {
-          this.confirmLoading = false;
-          this.ruleWriteModal = false
-        }, 2000);
+      excelEditClick(){
+        this.ruleWriteModalTitle = "Excel文件"
+        this.ruleType = 'Excel';
+        this.ruleWriteModal = true
+        // 清空规则内容，使之不断重现加载
+        this.form.meta = ''
+      },
+      editClick(){
+
+      },
+      // 当前日期之前无法选择
+      disabledDate (current) {
+        return current && current < moment().endOf('day')
+      },
+      postRuleForm(form){
+        console.log(form)
+        // let urlApi = "";
+        // postAction(urlApi,form).then((res)=>{
+        //   if (res.success){
+        //   }else{}
+        // })
+        this.$message.success(
+          '规则写入成功',
+          2,
+        );
+        // 清空填写的规则
+        this.resetForm()
+      },
+      ruleWriteOk() {
+        this.$refs.ruleForm.validate(valid => {
+          if (valid) {
+            this.form['type'] = this.ruleType
+            // 调用post写入数据库
+            this.postRuleForm(this.form)
+            //规则写入loading动画
+            this.confirmLoading = true;
+            setTimeout(() => {
+              this.confirmLoading = false;
+              this.ruleWriteModal = false
+            }, 2000);
+          } else {
+            this.$message.error(
+              '请仔细检查，内容填写有误',
+              2,
+            );
+            return false;
+          }
+        });
       },
       ruleWriteCancel(e) {
         console.log('Clicked cancel button');
         this.visible = false;
       },
-      onSubmit() {
-        this.$message.success(
-          'This is a prompt message for success, and it will disappear in 10 seconds',
-          3,
-        );
+      onRuleMetaSearch(value){
+        // 获取规则内容api
+        // let urlApi = "";
+        // let postList = [value]
+        // postAction(url,postList).then((res)=>{
+        //   if (res.success){
+        //     this.rulesMeta = value;
+        //   }
+        // })
+        this.form.meta = value
+      },
+      onRuleCheck() {
         this.$refs.ruleForm.validate(valid => {
-          if (valid) {
-            alert('submit!');
+          if (valid && !this.form.meta){
+            this.$message.error(
+              '请载入规则链接中的内容',
+              2,
+            );
+          }
+          else if (valid && this.form.meta) {
+            this.$message.success(
+              '验证成功，允许写入规则库',
+              2,
+            );
           } else {
-            console.log('error submit!!');
             return false;
           }
         });
@@ -210,12 +284,20 @@
       resetForm() {
         this.$refs.ruleForm.resetFields();
       },
+      // 文件下载
+      downloadExcelFile () {
+        let url = '/Users/yuanye/Documents/yy-paper2022/ant-design-vue-jeecg/src/views/emergency/rulebase/insuranceInfoCheck.xls'
+        let filename = '模版文件'
+        this.$message.warn('您点击了下载')
+      }
     },
     created() {
     }
   }
 </script>
 
-<style scoped>
-
+<style >
+  a {
+    color: inherit;
+  }
 </style>
