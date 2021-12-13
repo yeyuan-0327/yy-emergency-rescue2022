@@ -11,4 +11,5 @@ export const dataManageApi = {
   fetchDimFactRelation:'/datamanage/databaseInfo/fetchDimFactRelation',
   fetchDwData:'/datamanage/databaseInfo/fetchDwData',
   factDataTable:'/datamanage/databaseInfo/factDataTable',
+  ruleUploadExcel:'/ruleSet/uploadExcel'
 }

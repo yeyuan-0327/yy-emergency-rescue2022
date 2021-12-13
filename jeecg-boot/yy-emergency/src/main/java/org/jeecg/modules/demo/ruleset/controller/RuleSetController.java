@@ -5,10 +5,10 @@ import org.jeecg.common.api.vo.Result;
 import org.jeecg.modules.demo.ruleset.entity.InsuranceInfo;
 import org.jeecg.modules.demo.ruleset.service.IRuleService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,5 +69,13 @@ public class RuleSetController {
             return Result.error("fail");
         }
 
+    }
+
+    @RequestMapping(value = "/uploadExcel", method = RequestMethod.POST)
+    public Result<?> ruleUploadExcel(@RequestBody MultipartFile[] multipartFiles){
+        System.out.println(multipartFiles.length);
+        System.out.println(Arrays.toString(multipartFiles));
+        System.out.println("excel文件上传api");
+        return null;
     }
 }

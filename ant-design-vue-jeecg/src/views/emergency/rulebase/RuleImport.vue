@@ -38,7 +38,7 @@
             src="@/assets/file.png"
           />
           <template slot="actions" class="ant-card-actions">
-            <a-icon key="edit" type="edit" @click="editClick"/>
+            <a-icon key="edit" type="edit" @click="drlEditClick"/>
           </template>
           <a-card-meta title="Drl文件" description="通过Drl文件引入规则">
           </a-card-meta>
@@ -94,20 +94,19 @@
         </a-form-model-item>
         <a-form-model-item label="规则类型" >
           <a-button v-show="ruleType==='Jar'" disabled>
-            Jar
+            Jar类型
           </a-button>
           <a-space v-show="ruleType==='Excel'">
             <a-button  disabled>
-              Excel
+              Excel类型
             </a-button>
             <a-button @click="downloadExcelFile">
               <a-icon type="download" />
-              <a :href="url.downloadUrl" download="模版文件.xlsx">模版文件</a>
+              <a :href="url.downloadUrl" download="modal.xls">模版文件</a>
             </a-button>
           </a-space>
-
           <a-button v-show="ruleType==='Drl'" disabled>
-            Drl
+            Drl类型
           </a-button>
         </a-form-model-item>
 <!--        规则类型为Jar显示-->
@@ -122,9 +121,22 @@
             </a-button>
           </a-input-search>
         </a-form-model-item>
-<!--        -->
 
-
+<!--       规则类型为Excel Drl显示-->
+        <a-form-model-item
+          v-show="ruleType !== 'Jar'"
+          ref="resource"  label="规则链接" prop="resource">
+          <a-upload
+            :action="uploadExcelUrl"
+            :before-upload="handleBeforeUploadExcel"
+            :multiple="true"
+            :file-list="excelFileList"
+            @change="handleUploadExcel"
+            :showUploadList="{showRemoveIcon: true,showDownloadIcon: true}"
+          >
+            <a-button> <a-icon type="upload" /> Upload </a-button>
+          </a-upload>
+        </a-form-model-item>
 
         <a-form-model-item v-if="form.meta !== ''" label="规则详情" prop="meta" required>
           <a-input v-model="form.meta" type="textarea" disabled />
@@ -144,7 +156,7 @@
 </template>
 
 <script>
-  import {getAction, postAction} from "@/api/manage";
+  import {getAction, postAction,uploadAction} from "@/api/manage";
   import { dataManageApi } from '@/api/EmergencyApi.js'
   import AInputSearch from 'ant-design-vue/es/input/Search'
   import moment from 'moment'
@@ -156,7 +168,6 @@
         ruleWriteModal:false,
         ruleWriteModalTitle:"",
         confirmLoading: false,
-        ModalText:"xxxxx",
         //
         labelCol: { span: 4 },
         wrapperCol: { span: 14 },
@@ -178,16 +189,19 @@
           emergency_type: [{ required: true, message: '请选择所属险情类别', trigger: 'change' }],
           invalid_date: [{ required: true, message: '请选择失效时间', trigger: 'change' }],
           resource: [
-            { required: true, message: '请填入规则链接', trigger: 'blur' },
+            { required: true, message: '请引入规则链接', trigger: 'blur' },
           ],
           meta: [
             { required: true, message: '请点击搜索按钮', trigger: 'blur' },
           ],
         },
-        // excel模版文件地址
+        // excel模版文件
         url: {
-          downloadUrl: 'insuranceInfoCheck.xls',
+          downloadUrl: '/file/insuranceInfoCheck.xls',
         },
+        // excel文件上传
+        excelFileList: [],
+        uploadExcelUrl: dataManageApi.ruleUploadExcel,
       }
     },
     methods: {
@@ -196,23 +210,32 @@
         this.ruleWriteModalTitle = "Jar接口"
         this.ruleType = 'Jar';
         this.ruleWriteModal = true
-        // 清空规则内容，使之不断重现加载
+        // 清空规则内容，使之不断重新加载
         this.form.meta = ''
       },
       excelEditClick(){
         this.ruleWriteModalTitle = "Excel文件"
         this.ruleType = 'Excel';
         this.ruleWriteModal = true
-        // 清空规则内容，使之不断重现加载
+        // 清空规则内容，使之不断重新加载
         this.form.meta = ''
+        // excel文件列表为空
+        this.excelFileList = []
       },
-      editClick(){
-
+      drlEditClick(){
+        this.ruleWriteModalTitle = "Drl文件"
+        this.ruleType = 'Drl';
+        this.ruleWriteModal = true
+        // 清空规则内容，使之不断重新加载
+        this.form.meta = ''
+        // excel文件列表为空
+        this.excelFileList = []
       },
       // 当前日期之前无法选择
       disabledDate (current) {
         return current && current < moment().endOf('day')
       },
+      // 传递表单
       postRuleForm(form){
         console.log(form)
         // let urlApi = "";
@@ -227,6 +250,7 @@
         // 清空填写的规则
         this.resetForm()
       },
+      // 确认按钮
       ruleWriteOk() {
         this.$refs.ruleForm.validate(valid => {
           if (valid) {
@@ -252,6 +276,7 @@
         console.log('Clicked cancel button');
         this.visible = false;
       },
+      // jar链接搜索按钮
       onRuleMetaSearch(value){
         // 获取规则内容api
         // let urlApi = "";
@@ -263,6 +288,7 @@
         // })
         this.form.meta = value
       },
+      //验证按钮
       onRuleCheck() {
         this.$refs.ruleForm.validate(valid => {
           if (valid && !this.form.meta){
@@ -281,15 +307,62 @@
           }
         });
       },
+      // 重置按钮
       resetForm() {
         this.$refs.ruleForm.resetFields();
       },
-      // 文件下载
+      // excel文件下载
       downloadExcelFile () {
-        let url = '/Users/yuanye/Documents/yy-paper2022/ant-design-vue-jeecg/src/views/emergency/rulebase/insuranceInfoCheck.xls'
-        let filename = '模版文件'
         this.$message.warn('您点击了下载')
-      }
+      },
+      // excel文件上传
+      handleBeforeUploadExcel(info){
+        let formData = new FormData();
+        formData.append("multipartFiles", info);
+        uploadAction(this.uploadExcelUrl,formData).then((res)=>{
+          if (res.success){
+            console.log(res)
+          }
+        })
+        const status = 'done';
+        if (status === 'done') {
+          this.$message.success(`${info.name} 文件上传成功.`);
+          this.form.meta = "这是上传的规则文件内容"
+        } else if (status === 'error') {
+          this.$message.error(`${info.name} 文件上传失败.`);
+        }
+      },
+      //文件改变时的操作
+      handleUploadExcel(info) {
+        // console.log(info)
+        if (info.file.status=== 'removed'){
+          //清空规则内容
+          this.excelFileList = []
+          this.form.meta = ''
+        }
+        else{
+          this.excelFileList.push({
+            uid: -1,
+            name: info.file.name,
+            status: 'done',
+            url: '/file/insuranceInfoCheck.xls',
+          },)
+          let fileList = this.excelFileList;
+          // 1. Limit the number of uploaded files
+          //    Only to show two recent uploaded files, and old ones will be replaced by the new
+          fileList = fileList.slice(-1);
+          // // 2. read from response and show file link
+          // fileList = fileList.map(file => {
+          //   if (file.response) {
+          //     // Component will show file.url as link
+          //     file.url = file.response.url;
+          //   }
+          //   return file;
+          // });
+          //
+          this.excelFileList = fileList;
+        }
+      },
     },
     created() {
     }
