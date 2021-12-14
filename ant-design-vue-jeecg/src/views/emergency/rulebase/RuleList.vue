@@ -13,6 +13,12 @@
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
               <a-button type="primary" @click="searchRuleQuery" icon="search">查询</a-button>
               <a-button type="primary" @click="searchRuleReset" icon="reload" style="margin-left: 8px">重置</a-button>
+              <a-dropdown v-if="selectedRowKeys.length > 0">
+                <a-menu slot="overlay">
+                  <a-menu-item key="1" @click="batchSelectDel"><a-icon type="delete"/>删除</a-menu-item>
+                </a-menu>
+              <a-button style="margin-left: 8px"> 批量操作 <a-icon type="down" /></a-button>
+            </a-dropdown>
             </span>
           </a-col>
         </a-row>
@@ -41,7 +47,7 @@
         <span slot="action" slot-scope="text, record">
           <a @click="clickRuleToShow(record)">详情</a>
           <a-divider type="vertical" />
-          <a-popconfirm title="确定删除吗?" @confirm="() => handleRuleDelete(record.id)">
+          <a-popconfirm title="确定删除吗?" @confirm="() => handleRuleDelete(record.rowKey)">
             <a>删除</a>
           </a-popconfirm>
         </span>
@@ -54,6 +60,7 @@
              :confirm-loading="confirmLoading"
              switchFullscreen
              :width="1000"
+             :okButtonProps="{class:{'jee-hidden': true} }"
              @cancel="ruleWriteCancel">
       <a-form-model
         a-form-model :label-col="labelCol" :wrapper-col="wrapperCol">
@@ -64,38 +71,20 @@
         <a-form-model-item label="失效时间" required >
         </a-form-model-item>
         <a-form-model-item label="规则类型" >
-          <a-button v-show="ruleType==='Jar'" disabled>
+          <span v-show="ruleType==='Jar'">
             Jar类型
-          </a-button>
-          <a-button  v-show="ruleType==='Excel'" disabled>
+          </span>
+          <span  v-show="ruleType==='Excel'">
             Excel类型
-          </a-button>
-          <a-button v-show="ruleType==='Drl'" disabled>
+          </span>
+          <span v-show="ruleType==='Drl'">
             Drl类型
-          </a-button>
+          </span>
         </a-form-model-item>
-        <!--        规则类型为Jar显示-->
-        <a-form-model-item
-          v-show="ruleType==='Jar'"
-          ref="resource"  label="规则链接" prop="resource">
+        <a-form-model-item label="规则链接" >
         </a-form-model-item>
-        <!--       规则类型为Excel Drl显示-->
-        <a-form-model-item
-          v-show="ruleType !== 'Jar'"
-          ref="resource"  label="规则链接" prop="resource">
-          <!--          <a-upload-->
-          <!--            :action="uploadExcelUrl"-->
-          <!--            :before-upload="handleBeforeUploadExcel"-->
-          <!--            :multiple="true"-->
-          <!--            :file-list="excelFileList"-->
-          <!--            @change="handleUploadExcel"-->
-          <!--            :showUploadList="{showRemoveIcon: true,showDownloadIcon: true}"-->
-          <!--          >-->
-          <!--            <a-button> <a-icon type="download" /> download </a-button>-->
-          <!--          </a-upload>-->
-        </a-form-model-item>
-        <a-form-model-item v-if="ruleMeta !== ''" label="规则详情" prop="meta" required>
-          <a-input v-model="ruleMeta" type="textarea" disabled />
+        <a-form-model-item label="规则详情" >
+          {{ruleMeta}}
         </a-form-model-item>
 
       </a-form-model>
@@ -182,7 +171,7 @@
         //modal 内容
         labelCol: { span: 4 },
         wrapperCol: { span: 14 },
-        ruleMeta: "",
+        ruleMeta: "123",
 
       }
     },
@@ -219,11 +208,14 @@
       },
       //详情关闭按钮
       ruleWriteCancel(){
-
       },
-      //删除按钮
-      handleRuleDelete(){
-
+      //单个删除按钮
+      handleRuleDelete(id){
+        console.log(id)
+      },
+      //批量删除
+      batchSelectDel(){
+        console.log(this.selectedRowKeys)
       }
     }
   }

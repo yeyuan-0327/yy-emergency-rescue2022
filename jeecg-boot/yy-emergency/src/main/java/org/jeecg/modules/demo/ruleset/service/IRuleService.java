@@ -8,4 +8,6 @@ public interface IRuleService {
     List<String> insuranceInfoCheck(InsuranceInfo insuranceInfo) throws Exception;
 
     List<String> jarInfoCheck() throws Exception;
+
+    List<String> compileJarLink(List<String> postList) throws Exception;
 }

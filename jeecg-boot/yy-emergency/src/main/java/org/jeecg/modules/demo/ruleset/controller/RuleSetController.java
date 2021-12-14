@@ -1,17 +1,16 @@
 package org.jeecg.modules.demo.ruleset.controller;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.modules.demo.ruleset.entity.InsuranceInfo;
 import org.jeecg.modules.demo.ruleset.service.IRuleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RequestMapping("/ruleSet")
 @RestController
@@ -25,7 +24,7 @@ public class RuleSetController {
         result.setSuccess(true);
         return result;
     }
-
+    //drools服务
     @Autowired
     private IRuleService ruleService;
 
@@ -70,8 +69,18 @@ public class RuleSetController {
         }
 
     }
+    @RequestMapping(value = "/ruleCite/compileJarLink", method = RequestMethod.POST)
+    public Result<?> compileJarLink(@RequestBody List<String> postList) throws Exception{
+        List<String> res = ruleService.compileJarLink(postList);
+        return Result.OK(res);
+    }
+    @RequestMapping(value = "/ruleCite/ruleUploadDB", method = RequestMethod.POST)
+    public Result<?> ruleUploadDB(@RequestBody Object postList){
+        System.out.println(postList);
+        return Result.OK("xxx");
+    }
 
-    @RequestMapping(value = "/uploadExcel", method = RequestMethod.POST)
+    @RequestMapping(value = "/ruleCite/ruleUploadExcel", method = RequestMethod.POST)
     public Result<?> ruleUploadExcel(@RequestBody MultipartFile[] multipartFiles){
         System.out.println(multipartFiles.length);
         System.out.println(Arrays.toString(multipartFiles));

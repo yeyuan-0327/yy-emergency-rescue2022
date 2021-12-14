@@ -138,8 +138,8 @@
           </a-upload>
         </a-form-model-item>
 
-        <a-form-model-item v-if="form.meta !== ''" label="规则详情" prop="meta" required>
-          <a-input v-model="form.meta" type="textarea" disabled />
+        <a-form-model-item v-if="form.meta !== ''" label="规则详情" required prop="meta">
+          <a-textarea v-model="form.meta" :auto-size="{ minRows: 2, maxRows: 6 }" disabled />
         </a-form-model-item>
 
         <a-form-model-item :wrapper-col="{ span: 14, offset: 4 }">
@@ -160,9 +160,10 @@
   import { dataManageApi } from '@/api/EmergencyApi.js'
   import AInputSearch from 'ant-design-vue/es/input/Search'
   import moment from 'moment'
+  import ATextarea from 'ant-design-vue/es/input/TextArea'
   export default {
     name: 'RuleImport',
-    components: { AInputSearch },
+    components: { ATextarea, AInputSearch },
     data () {
       return {
         ruleWriteModal:false,
@@ -210,26 +211,22 @@
         this.ruleWriteModalTitle = "Jar接口"
         this.ruleType = 'Jar';
         this.ruleWriteModal = true
-        // 清空规则内容，使之不断重新加载
-        this.form.meta = ''
+        // 清空内容，使之不断重新加载
+        this.resetForm()
       },
       excelEditClick(){
         this.ruleWriteModalTitle = "Excel文件"
         this.ruleType = 'Excel';
         this.ruleWriteModal = true
-        // 清空规则内容，使之不断重新加载
-        this.form.meta = ''
-        // excel文件列表为空
-        this.excelFileList = []
+        // 清空内容，使之不断重新加载
+        this.resetForm()
       },
       drlEditClick(){
         this.ruleWriteModalTitle = "Drl文件"
         this.ruleType = 'Drl';
         this.ruleWriteModal = true
-        // 清空规则内容，使之不断重新加载
-        this.form.meta = ''
-        // excel文件列表为空
-        this.excelFileList = []
+        // 清空内容，使之不断重新加载
+        this.resetForm()
       },
       // 当前日期之前无法选择
       disabledDate (current) {
@@ -237,35 +234,39 @@
       },
       // 传递表单
       postRuleForm(form){
-        console.log(form)
-        // let urlApi = "";
-        // postAction(urlApi,form).then((res)=>{
-        //   if (res.success){
-        //   }else{}
-        // })
-        this.$message.success(
-          '规则写入成功',
-          2,
-        );
-        // 清空填写的规则
-        this.resetForm()
+        //确认按钮 loading动画
+        this.confirmLoading = true;
+        // 调用api
+        let urlApi = dataManageApi.ruleUploadDB;
+        postAction(urlApi,form).then((res)=>{
+          if (res.success){
+            console.log(res.result)
+            this.$message.success(
+              '规则写入成功',
+              2,
+            );
+            this.confirmLoading = false;
+            this.ruleWriteModal = false
+          }
+          else{
+            this.$message.error(
+              '服务器原因，上传失败',
+              2,
+            );
+            this.confirmLoading = false;
+          }
+        })
       },
       // 确认按钮
       ruleWriteOk() {
         this.$refs.ruleForm.validate(valid => {
-          if (valid) {
+          if (valid && this.form.meta) {
             this.form['type'] = this.ruleType
             // 调用post写入数据库
             this.postRuleForm(this.form)
-            //规则写入loading动画
-            this.confirmLoading = true;
-            setTimeout(() => {
-              this.confirmLoading = false;
-              this.ruleWriteModal = false
-            }, 2000);
           } else {
             this.$message.error(
-              '请仔细检查，内容填写有误',
+              '请检查，内容有误或未载入规则链接中的内容',
               2,
             );
             return false;
@@ -279,37 +280,50 @@
       // jar链接搜索按钮
       onRuleMetaSearch(value){
         // 获取规则内容api
-        // let urlApi = "";
-        // let postList = [value]
-        // postAction(url,postList).then((res)=>{
-        //   if (res.success){
-        //     this.rulesMeta = value;
-        //   }
-        // })
-        this.form.meta = value
+        let urlApi = dataManageApi.compileJarLink;
+        let postList = [value]
+        postAction(urlApi,postList).then((res)=>{
+          if (res.success){
+            let meta = '';
+            _(res.result).forEach(function(value,key) {
+              if (key!==0) meta += key + ".";
+              meta += value;
+              meta += '\n';
+            })
+            this.form.meta = meta
+          }
+          else{
+            this.$message.error(
+              '请仔细检查规则链接，内容无法解析',
+              2,
+            );
+          }
+        })
       },
       //验证按钮
       onRuleCheck() {
         this.$refs.ruleForm.validate(valid => {
-          if (valid && !this.form.meta){
-            this.$message.error(
-              '请载入规则链接中的内容',
-              2,
-            );
-          }
-          else if (valid && this.form.meta) {
+          if (valid && this.form.meta) {
             this.$message.success(
               '验证成功，允许写入规则库',
               2,
             );
           } else {
+            this.$message.error(
+              '请检查，内容有误或未载入规则链接中的内容',
+              2,
+            );
             return false;
           }
         });
       },
       // 重置按钮
       resetForm() {
-        this.$refs.ruleForm.resetFields();
+        this.form.meta = ''
+        this.excelFileList = []
+        this.$nextTick(()=> {
+          this.$refs.ruleForm.resetFields();
+        })
       },
       // excel文件下载
       downloadExcelFile () {
