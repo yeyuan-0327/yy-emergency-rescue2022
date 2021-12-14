@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.modules.demo.ruleset.entity.InsuranceInfo;
 import org.jeecg.modules.demo.ruleset.service.IRuleService;
+import org.jeecg.modules.demo.ruleset.service.IRuleSetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,10 @@ import java.util.*;
 @Slf4j
 
 public class RuleSetController {
+    //规则服务
+    @Autowired
+    private IRuleSetService iRuleSetService;
+
     @GetMapping(value = "/hello")
     public Result<String> hello() {
         Result<String> result = new Result<String>();
@@ -75,9 +80,9 @@ public class RuleSetController {
         return Result.OK(res);
     }
     @RequestMapping(value = "/ruleCite/ruleUploadDB", method = RequestMethod.POST)
-    public Result<?> ruleUploadDB(@RequestBody Object postList){
-        System.out.println(postList);
-        return Result.OK("xxx");
+    public Result<?> ruleUploadDB(@RequestBody LinkedHashMap<String,Object> postList) throws Exception {
+        int last_id = iRuleSetService.ruleUploadDB(postList);
+        return Result.OK(last_id);
     }
 
     @RequestMapping(value = "/ruleCite/ruleUploadExcel", method = RequestMethod.POST)

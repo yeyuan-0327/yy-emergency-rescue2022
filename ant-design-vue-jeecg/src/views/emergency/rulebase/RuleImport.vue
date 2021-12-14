@@ -112,10 +112,10 @@
 <!--        规则类型为Jar显示-->
         <a-form-model-item
           v-show="ruleType==='Jar'"
-          ref="resource"  label="规则链接" prop="resource">
-          <a-input-search @search="onRuleMetaSearch" v-model="form.resource"
-                          @blur="() => {$refs.resource.onFieldBlur();}">
-            <a-button v-if="form.resource === ''" slot="enterButton" type="primary" icon="search" disabled>
+          ref="path"  label="规则链接" prop="path">
+          <a-input-search @search="onRuleMetaSearch" v-model="form.path"
+                          @blur="() => {$refs.path.onFieldBlur();}">
+            <a-button v-if="form.path === ''" slot="enterButton" type="primary" icon="search" disabled>
             </a-button>
             <a-button v-else slot="enterButton" type="primary" icon="search">
             </a-button>
@@ -179,17 +179,17 @@
           name: '',
           emergency_type: undefined,
           invalid_date: undefined,
-          resource: '',
+          path: '',
           meta: ''
         },
         rules: {
           name: [
             { required: true, message: '请输入规则名称', trigger: 'blur' },
-            { min: 2, max: 10, message: '长度应该在2到10之间', trigger: 'blur' },
+            { min: 2, max: 20, message: '长度应该在2到20之间', trigger: 'blur' },
           ],
           emergency_type: [{ required: true, message: '请选择所属险情类别', trigger: 'change' }],
           invalid_date: [{ required: true, message: '请选择失效时间', trigger: 'change' }],
-          resource: [
+          path: [
             { required: true, message: '请引入规则链接', trigger: 'blur' },
           ],
           meta: [

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.demo.ruleset.mapper.RuleSetMapper">
+    <insert id="ruleUploadDB" parameterType="org.jeecg.modules.demo.ruleset.entity.Rule"
+            keyProperty="id" useGeneratedKeys="true">
+    INSERT INTO rule_table()
+    VALUES (#{id},#{name},#{type},#{path}, #{meta}, #{emergency_type}, #{invalid_date}, #{update})
+</insert>
+</mapper>
