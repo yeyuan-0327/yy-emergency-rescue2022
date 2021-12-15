@@ -4,6 +4,14 @@
     <insert id="ruleUploadDB" parameterType="org.jeecg.modules.demo.ruleset.entity.Rule"
             keyProperty="id" useGeneratedKeys="true">
     INSERT INTO rule_table()
-    VALUES (#{id},#{name},#{type},#{path}, #{meta}, #{emergency_type}, #{invalid_date}, #{update})
-</insert>
+    VALUES (#{id},#{name},#{type},#{path}, #{meta}, #{emergency_type}, #{invalid_date}, #{update},#{delete_flag})
+    </insert>
+
+    <select id="getRuleList" parameterType="java.lang.String" resultType="java.util.HashMap">
+        SELECT * FROM rule_table WHERE delete_flag = 0;
+    </select>
+
+    <update id="deleteRule">
+        UPDATE rule_table SET delete_flag = 1 WHERE id = '${id}';
+    </update>
 </mapper>

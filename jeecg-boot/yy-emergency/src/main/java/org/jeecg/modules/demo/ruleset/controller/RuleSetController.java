@@ -79,17 +79,29 @@ public class RuleSetController {
         List<String> res = ruleService.compileJarLink(postList);
         return Result.OK(res);
     }
+
+    @RequestMapping(value = "/ruleCite/ruleUploadExcel", method = RequestMethod.POST)
+    public Result<?> ruleUploadExcel(@RequestBody MultipartFile[] multipartFiles) throws Exception{
+        String savePath = ruleService.ruleUploadExcel(multipartFiles);
+        System.out.println("excel文件上传api");
+        return Result.OK(savePath);
+    }
+
     @RequestMapping(value = "/ruleCite/ruleUploadDB", method = RequestMethod.POST)
     public Result<?> ruleUploadDB(@RequestBody LinkedHashMap<String,Object> postList) throws Exception {
         int last_id = iRuleSetService.ruleUploadDB(postList);
         return Result.OK(last_id);
     }
 
-    @RequestMapping(value = "/ruleCite/ruleUploadExcel", method = RequestMethod.POST)
-    public Result<?> ruleUploadExcel(@RequestBody MultipartFile[] multipartFiles){
-        System.out.println(multipartFiles.length);
-        System.out.println(Arrays.toString(multipartFiles));
-        System.out.println("excel文件上传api");
-        return null;
+    @GetMapping("/ruleList/getRuleList")
+    public Result<?> getRuleList() {
+        List<Map<String, Object>> res = iRuleSetService.getRuleList();
+        return Result.OK(res);
+    }
+
+    @RequestMapping(value = "/ruleList/deleteRule", method = RequestMethod.POST)
+    public Result<?> deleteRule(@RequestBody List<String> postList){
+        boolean res = iRuleSetService.deleteRule(postList);
+        return Result.OK(res);
     }
 }

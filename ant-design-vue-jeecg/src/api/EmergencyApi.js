@@ -11,9 +11,15 @@ export const dataManageApi = {
   fetchDimFactRelation:'/datamanage/databaseInfo/fetchDimFactRelation',
   fetchDwData:'/datamanage/databaseInfo/fetchDwData',
   factDataTable:'/datamanage/databaseInfo/factDataTable',
+}
+
+export const ruleBaseSet = {
   //Excel规则文件上传
   ruleUploadExcel:'/ruleSet/ruleCite/ruleUploadExcel',
   //Jar链接解析
   compileJarLink:'/ruleSet/ruleCite/compileJarLink',
   ruleUploadDB:'/ruleSet/ruleCite/ruleUploadDB',
+  //获取rule列表
+  getRuleList: '/ruleSet/ruleList/getRuleList',
+  deleteRule: '/ruleSet/ruleList/deleteRule',
 }

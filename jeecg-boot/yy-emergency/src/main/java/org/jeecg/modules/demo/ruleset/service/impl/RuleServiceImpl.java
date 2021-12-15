@@ -1,22 +1,15 @@
 package org.jeecg.modules.demo.ruleset.service.impl;
 
 import com.rule.rulemodal.Person;
-import org.drools.core.io.impl.UrlResource;
 import org.jeecg.modules.demo.ruleset.entity.InsuranceInfo;
 import org.jeecg.modules.demo.ruleset.service.IRuleService;
 import org.jeecg.modules.demo.ruleset.utils.KieSessionUtils;
-import org.kie.api.KieServices;
-import org.kie.api.builder.KieModule;
-import org.kie.api.builder.KieRepository;
-import org.kie.api.definition.KiePackage;
-import org.kie.api.definition.rule.Rule;
-import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.InputStream;
+import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /***
@@ -24,6 +17,7 @@ import java.util.List;
  */
 @Service
 public class RuleServiceImpl implements IRuleService {
+    private final static String ROOTPATH = "/Users/yuanye/Documents/yy-paper2022/ant-design-vue-jeecg/public/file/";
     public List<String> insuranceInfoCheck(InsuranceInfo insuranceInfo) throws Exception{
         String filePath = "/Users/yuanye/Documents/yy-paper2022/jeecg-boot/yy-emergency/src/main/resources/insuranceInfoCheck.xls";
         KieSession session = KieSessionUtils.getKieSessionFromXLS(filePath);
@@ -61,5 +55,17 @@ public class RuleServiceImpl implements IRuleService {
         KieSession session = KieSessionUtils.UrlLinkReturnSession(url);
         assert session != null;
         return KieSessionUtils.CheckRuleMetaContent(session);
+    }
+
+    @Override
+    public String ruleUploadExcel(MultipartFile[] multipartFiles) throws Exception{
+        String savePath = "";
+        for (MultipartFile i :multipartFiles){
+            savePath = ROOTPATH + i.getOriginalFilename();
+            System.out.println("上传的文件：" + i.getName() + "," + i.getContentType() + "," + i.getOriginalFilename()
+                            +"，保存的路径为：" + savePath);
+            i.transferTo(new File(savePath));
+        }
+        return savePath;
     }
 }

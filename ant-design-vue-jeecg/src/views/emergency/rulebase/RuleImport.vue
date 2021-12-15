@@ -72,13 +72,13 @@
         <a-form-model-item label="所属险情" prop="emergency_type">
           <a-select v-model="form.emergency_type" placeholder="请输入该规则的归属险情类别">
 <!--        预留接口 可以从接口中获取到险情类别-->
-            <a-select-option value="socialEmergency">
+            <a-select-option value="社会动员">
               社会动员
             </a-select-option>
-            <a-select-option value="peopleSettlement">
+            <a-select-option value="人员安置">
               人员安置
             </a-select-option>
-            <a-select-option value="peopleRescue">
+            <a-select-option value="人员搜救">
               人员搜救
             </a-select-option>
           </a-select>
@@ -102,7 +102,7 @@
             </a-button>
             <a-button @click="downloadExcelFile">
               <a-icon type="download" />
-              <a :href="url.downloadUrl" download="modal.xls">模版文件</a>
+              <a :href="url.downloadUrl" download="modal.xls" style="color: inherit;">模版文件</a>
             </a-button>
           </a-space>
           <a-button v-show="ruleType==='Drl'" disabled>
@@ -125,10 +125,9 @@
 <!--       规则类型为Excel Drl显示-->
         <a-form-model-item
           v-show="ruleType !== 'Jar'"
-          ref="resource"  label="规则链接" prop="resource">
+          ref="path"  label="规则链接" prop="path">
           <a-upload
             :action="uploadExcelUrl"
-            :before-upload="handleBeforeUploadExcel"
             :multiple="true"
             :file-list="excelFileList"
             @change="handleUploadExcel"
@@ -157,10 +156,11 @@
 
 <script>
   import {getAction, postAction,uploadAction} from "@/api/manage";
-  import { dataManageApi } from '@/api/EmergencyApi.js'
+  import { ruleBaseSet } from '@/api/EmergencyApi.js'
   import AInputSearch from 'ant-design-vue/es/input/Search'
   import moment from 'moment'
   import ATextarea from 'ant-design-vue/es/input/TextArea'
+
   export default {
     name: 'RuleImport',
     components: { ATextarea, AInputSearch },
@@ -202,7 +202,7 @@
         },
         // excel文件上传
         excelFileList: [],
-        uploadExcelUrl: dataManageApi.ruleUploadExcel,
+        uploadExcelUrl: ruleBaseSet.ruleUploadExcel,
       }
     },
     methods: {
@@ -234,10 +234,11 @@
       },
       // 传递表单
       postRuleForm(form){
+        console.log(form)
         //确认按钮 loading动画
         this.confirmLoading = true;
         // 调用api
-        let urlApi = dataManageApi.ruleUploadDB;
+        let urlApi = ruleBaseSet.ruleUploadDB;
         postAction(urlApi,form).then((res)=>{
           if (res.success){
             console.log(res.result)
@@ -280,7 +281,7 @@
       // jar链接搜索按钮
       onRuleMetaSearch(value){
         // 获取规则内容api
-        let urlApi = dataManageApi.compileJarLink;
+        let urlApi = ruleBaseSet.compileJarLink;
         let postList = [value]
         postAction(urlApi,postList).then((res)=>{
           if (res.success){
@@ -330,51 +331,43 @@
         this.$message.warn('您点击了下载')
       },
       // excel文件上传
-      handleBeforeUploadExcel(info){
+      uploadExcel(file){
+        console.log(file)
         let formData = new FormData();
-        formData.append("multipartFiles", info);
+        formData.append("multipartFiles", file);
+        // 文件上传api
         uploadAction(this.uploadExcelUrl,formData).then((res)=>{
           if (res.success){
-            console.log(res)
+            this.excelFileList.push({
+              uid: file.uid,
+              name: file.name,
+              status: 'done',
+              url: '/file/' + file.name,
+            },)
+            let fileList = this.excelFileList;
+            // 1. Limit the number of uploaded files
+            //    Only to show two recent uploaded files, and old ones will be replaced by the new
+            fileList = fileList.slice(-1);
+            this.excelFileList = fileList;
+            this.$message.success(`${file.name} 文件上传成功.`);
+            this.form.path = res.result;
+            this.form.meta = "这是上传的Excel规则文件内容"
+          }
+          else{
+            this.$message.error(`${file.name} 文件上传失败.`);
           }
         })
-        const status = 'done';
-        if (status === 'done') {
-          this.$message.success(`${info.name} 文件上传成功.`);
-          this.form.meta = "这是上传的规则文件内容"
-        } else if (status === 'error') {
-          this.$message.error(`${info.name} 文件上传失败.`);
-        }
       },
       //文件改变时的操作
       handleUploadExcel(info) {
-        // console.log(info)
         if (info.file.status=== 'removed'){
           //清空规则内容
           this.excelFileList = []
           this.form.meta = ''
         }
         else{
-          this.excelFileList.push({
-            uid: -1,
-            name: info.file.name,
-            status: 'done',
-            url: '/file/insuranceInfoCheck.xls',
-          },)
-          let fileList = this.excelFileList;
-          // 1. Limit the number of uploaded files
-          //    Only to show two recent uploaded files, and old ones will be replaced by the new
-          fileList = fileList.slice(-1);
-          // // 2. read from response and show file link
-          // fileList = fileList.map(file => {
-          //   if (file.response) {
-          //     // Component will show file.url as link
-          //     file.url = file.response.url;
-          //   }
-          //   return file;
-          // });
-          //
-          this.excelFileList = fileList;
+          // 上传excel文件
+          this.uploadExcel(info.file.originFileObj)
         }
       },
     },
@@ -384,7 +377,7 @@
 </script>
 
 <style >
-  a {
-    color: inherit;
-  }
+  /*a {*/
+  /*  color: inherit;*/
+  /*}*/
 </style>

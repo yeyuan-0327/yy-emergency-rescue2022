@@ -36,7 +36,7 @@
         size="middle"
         :scroll="{x:true}"
         bordered
-        rowKey="rowKey"
+        rowKey="id"
         :columns="columns"
         :dataSource="dataSource"
         :pagination="paginationOpt"
@@ -47,7 +47,7 @@
         <span slot="action" slot-scope="text, record">
           <a @click="clickRuleToShow(record)">详情</a>
           <a-divider type="vertical" />
-          <a-popconfirm title="确定删除吗?" @confirm="() => handleRuleDelete(record.rowKey)">
+          <a-popconfirm title="确定删除吗?" @confirm="() => handleRuleDelete(record.id)">
             <a>删除</a>
           </a-popconfirm>
         </span>
@@ -65,26 +65,27 @@
       <a-form-model
         a-form-model :label-col="labelCol" :wrapper-col="wrapperCol">
         <a-form-model-item label="规则名称" required>
+          {{rule.name}}
         </a-form-model-item>
         <a-form-model-item label="所属险情" required>
+          {{rule.emergency_type}}
         </a-form-model-item>
-        <a-form-model-item label="失效时间" required >
-        </a-form-model-item>
-        <a-form-model-item label="规则类型" >
-          <span v-show="ruleType==='Jar'">
+        <a-form-model-item label="规则类型" required>
+          <span v-show="rule.type==='Jar'">
             Jar类型
           </span>
-          <span  v-show="ruleType==='Excel'">
+          <span v-show="rule.type==='Excel'">
             Excel类型
           </span>
-          <span v-show="ruleType==='Drl'">
+          <span v-show="rule.type==='Drl'">
             Drl类型
           </span>
         </a-form-model-item>
         <a-form-model-item label="规则链接" >
+          <span>{{rule.path}}</span>
         </a-form-model-item>
         <a-form-model-item label="规则详情" >
-          {{ruleMeta}}
+          <span>{{rule.meta}}</span>
         </a-form-model-item>
 
       </a-form-model>
@@ -95,16 +96,9 @@
 
 <script>
   import '@/assets/less/TableExpand.less'
-
-  const data = [];
-  for (let i = 0; i < 46; i++) {
-    data.push({
-      rowKey: i,
-      name: `Edward King ${i}`,
-      age: 32,
-      address: `London, Park Lane no. ${i}`,
-    });
-  }
+  import {getAction, postAction} from "@/api/manage";
+  import { ruleBaseSet } from '@/api/EmergencyApi.js'
+  import _ from 'lodash'
 
   export default {
     name: 'RuleList',
@@ -114,7 +108,6 @@
         ruleWriteModal:false,
         ruleWriteModalTitle:"",
         confirmLoading: false,
-        ruleType:"",
 
         //表格上方内容配置
         searchRuleName:"",
@@ -123,20 +116,30 @@
         //表格配置
         columns:[
           {
-            title: 'Name',
+            title: '规则名',
             align:"center",
             dataIndex: 'name',
             filteredValue: this.searchRuleName ? this.searchRuleName: null,
           },
           {
-            title: 'Age',
+            title: '规则类型',
             align:"center",
-            dataIndex: 'age',
+            dataIndex: 'type',
           },
           {
-            title: 'Address',
+            title: '所属险情',
             align:"center",
-            dataIndex: 'address',
+            dataIndex: 'emergency_type',
+          },
+          {
+            title: '生效时间',
+            align:"center",
+            dataIndex: 'update',
+          },
+          {
+            title: '失效时间',
+            align:"center",
+            dataIndex: 'invalid_date',
           },
           {
             title: '操作',
@@ -147,7 +150,7 @@
             scopedSlots: { customRender: 'action' }
           }
         ],
-        dataSource:data,
+        dataSource:[],
         //表格数据分页设置
         paginationOpt: {
           defaultCurrent: 1, // 默认当前页数
@@ -171,11 +174,30 @@
         //modal 内容
         labelCol: { span: 4 },
         wrapperCol: { span: 14 },
-        ruleMeta: "123",
-
+        rule:[
+          {
+            name: "",
+            type: "",
+            path: "",
+            meta: "",
+            emergency_type:"",
+          }
+        ],
       }
     },
+    created() {
+      this.getRuleList();
+    },
     methods:{
+      //得到规则列表
+      getRuleList(){
+        let urlApi = ruleBaseSet.getRuleList;
+        getAction(urlApi).then((res)=>{
+          if (res.success){
+            this.dataSource = res.result
+          }
+        })
+      },
       //规则名搜索按钮
       searchRuleQuery(){
         console.log("搜索按钮")
@@ -201,21 +223,31 @@
         this.selectedRowKeys = selectedRowKeys;
       },
       //详情按钮
-      clickRuleToShow(){
-        this.ruleWriteModalTitle = "Jar接口"
-        this.ruleType = 'Jar';
+      clickRuleToShow(record){
+        this.ruleWriteModalTitle = record.name
         this.ruleWriteModal = true
+        this.rule.name=record.name;
+        this.rule.type=record.type;
+        this.rule.path=record.path;
+        this.rule.meta=record.meta;
+        this.rule.emergency_type=record.emergency_type;
+        this.invalid_date=record.invalid_date;
       },
       //详情关闭按钮
       ruleWriteCancel(){
       },
       //单个删除按钮
       handleRuleDelete(id){
-        console.log(id)
+        let urlApi = ruleBaseSet.deleteRule;
+        let postList = [id];
+        postAction(urlApi,postList).then((res)=>{
+          if (res.success){
+            this.getRuleList()
+          }
+        })
       },
       //批量删除
       batchSelectDel(){
-        console.log(this.selectedRowKeys)
       }
     }
   }

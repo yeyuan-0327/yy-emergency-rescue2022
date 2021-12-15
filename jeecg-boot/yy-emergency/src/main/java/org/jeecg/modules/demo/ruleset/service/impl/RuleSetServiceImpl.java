@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -32,5 +34,17 @@ public class RuleSetServiceImpl implements IRuleSetService {
         // 插入数据库
         ruleSetMapper.ruleUploadDB(rule);
         return rule.getId();
+    }
+
+    @Override
+    public List<Map<String, Object>> getRuleList() {
+        return ruleSetMapper.getRuleList();
+    }
+
+    @Override
+    public boolean deleteRule(List<String> postList) {
+        int len = 0;
+        for(String id : postList) len += ruleSetMapper.deleteRule(id);
+        return len == postList.size();
     }
 }
