@@ -23,3 +23,7 @@ export const ruleBaseSet = {
   getRuleList: '/ruleSet/ruleList/getRuleList',
   deleteRule: '/ruleSet/ruleList/deleteRule',
 }
+
+export const emergencyCompile={
+
+}

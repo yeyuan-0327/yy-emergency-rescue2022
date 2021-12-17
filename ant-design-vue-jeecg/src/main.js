@@ -7,8 +7,9 @@ import Storage from 'vue-ls'
 import router from './router'
 import store from './store/'
 import { VueAxios } from "@/utils/request"
-import * as echarts from 'echarts'
-Vue.prototype.$echarts = echarts
+
+import vueAudioNative from 'vue-audio-native'
+Vue.use(vueAudioNative)
 
 require('@jeecg/antd-online-mini')
 require('@jeecg/antd-online-mini/dist/OnlineForm.css')

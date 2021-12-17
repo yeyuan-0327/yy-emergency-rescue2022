@@ -2,7 +2,7 @@
   <a-card :bordered="false">
     <!-- 查询区域 -->
     <div class="table-page-search-wrapper">
-      <a-form layout="inline" @keyup.enter.native="searchQuery">
+      <a-form layout="inline" @keyup.enter.native="searchRuleQuery">
         <a-row :gutter="24">
           <a-col :xl="6" :lg="7" :md="8" :sm="24">
             <a-form-item label="规则名">
@@ -200,19 +200,16 @@
       },
       //规则名搜索按钮
       searchRuleQuery(){
-        console.log("搜索按钮")
         if (this.dataSource && this.searchRuleName !== '') {
           this.dataSource = this.dataSource.filter(
             (p) => p.name.indexOf(this.searchRuleName) !== -1
           )
-        } else {
-          this.dataSource=data
         }
       },
       //重置搜索按钮
       searchRuleReset(){
         this.searchRuleName = ''
-        console.log("重置搜索按钮")
+        this.getRuleList()
       },
       //清空已选择
       onClearSelected(){

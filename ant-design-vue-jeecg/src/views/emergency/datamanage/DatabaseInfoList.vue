@@ -6,7 +6,7 @@
         <a-row :gutter="24">
           <a-col :xl="6" :lg="7" :md="8" :sm="24">
             <a-form-item label="表名">
-              <a-input placeholder="请输入表名" v-model="queryParam.name"></a-input>
+              <a-input placeholder="请输入表名" v-model="queryParam.chineseName"></a-input>
             </a-form-item>
           </a-col>
           <a-col :xl="6" :lg="7" :md="8" :sm="24">
@@ -224,7 +224,6 @@
         columns: [
           {
             title: '序号',
-            dataIndex: '',
             key:'rowIndex',
             width:60,
             align:"center",
@@ -296,6 +295,14 @@
         fieldList.push({type:'string',value:'content',text:'描述信息',dictCode:''})
         fieldList.push({type:'datetime',value:'createTime',text:'创建日期'})
         this.superFieldList = fieldList
+      },
+      //搜索按钮
+      searchQuery(){
+        if (this.dataSource && this.queryParam.chineseName !== '') {
+          this.dataSource = this.dataSource.filter(
+            (p) => p.chineseName.indexOf(this.queryParam.chineseName) !== -1
+          )
+        }
       },
       //chart初始化数据
       drawChart(field,fieldSecond){

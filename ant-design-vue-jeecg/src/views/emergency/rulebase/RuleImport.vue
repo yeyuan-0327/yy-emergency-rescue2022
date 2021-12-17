@@ -242,20 +242,11 @@
         postAction(urlApi,form).then((res)=>{
           if (res.success){
             console.log(res.result)
-            this.$message.success(
-              '规则写入成功',
-              2,
-            );
-            this.confirmLoading = false;
+            this.$message.success('规则写入成功',2);
             this.ruleWriteModal = false
           }
-          else{
-            this.$message.error(
-              '服务器原因，上传失败',
-              2,
-            );
-            this.confirmLoading = false;
-          }
+          else this.$message.error('服务器原因，上传失败',2);
+          this.confirmLoading = false;
         })
       },
       // 确认按钮
@@ -293,27 +284,16 @@
             })
             this.form.meta = meta
           }
-          else{
-            this.$message.error(
-              '请仔细检查规则链接，内容无法解析',
-              2,
-            );
-          }
+          else this.$message.error('请仔细检查规则链接，内容无法解析',2);
         })
       },
       //验证按钮
       onRuleCheck() {
         this.$refs.ruleForm.validate(valid => {
           if (valid && this.form.meta) {
-            this.$message.success(
-              '验证成功，允许写入规则库',
-              2,
-            );
+            this.$message.success('验证成功，允许写入规则库',2);
           } else {
-            this.$message.error(
-              '请检查，内容有误或未载入规则链接中的内容',
-              2,
-            );
+            this.$message.error('请检查，内容有误或未载入规则链接中的内容',2);
             return false;
           }
         });
