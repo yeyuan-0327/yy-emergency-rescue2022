@@ -5,8 +5,8 @@
       <a-form layout="inline" @keyup.enter.native="searchRuleQuery">
         <a-row :gutter="24">
           <a-col :xl="6" :lg="7" :md="8" :sm="24">
-            <a-form-item label="规则名">
-              <a-input placeholder="请输入规则名" v-model="searchRuleName"></a-input>
+            <a-form-item label="规则名称">
+              <a-input placeholder="请输入规则名称" v-model="searchRuleName"></a-input>
             </a-form-item>
           </a-col>
           <a-col :xl="6" :lg="7" :md="8" :sm="24">

@@ -5,8 +5,8 @@
       <a-form layout="inline" @keyup.enter.native="searchEmergencyQuery">
         <a-row :gutter="24">
           <a-col :xl="6" :lg="7" :md="8" :sm="24">
-            <a-form-item label="规则名">
-              <a-input placeholder="请输入规则名" v-model="searchEmergencyName"></a-input>
+            <a-form-item label="险情名称">
+              <a-input placeholder="请输入险情名称" v-model="searchEmergencyName"></a-input>
             </a-form-item>
           </a-col>
           <a-col :xl="6" :lg="7" :md="8" :sm="24">
@@ -44,17 +44,17 @@
              switchFullscreen
              :width="1000"
              :footer="null">
-<!--          步骤栏-->
       <div>
         <a-page-header
           title="新增险情文件"
           style="margin-left: -25px;margin-top: -20px;"
         ></a-page-header>
       </div>
+        <!--步骤栏-->
       <div>
         <a-steps :current="current" >
           <a-step v-for="item in steps" :key="item.title" :title="item.title" >
-            <a-icon slot="icon" :type="item.icon"></a-icon>
+            <a-icon slot="icon" :type="item.key < current ? 'check':item.icon"></a-icon>
           </a-step>
         </a-steps>
         <div v-if="current === 0" style="margin-top: 30px;height: 300px;">
@@ -71,25 +71,28 @@
               点击上传或拖拽上传
             </p>
             <p class="ant-upload-hint">
-              支持Word文件和Wav语音文件，解析识别单个险情命令
+              支持Word文件和Wav语音文件，解析识别单个险情命令。
             </p>
           </a-upload-dragger>
+          <a-button @click="recordVocal" style="margin-top: 20px;" type="link">可录音</a-button>
         </div>
-        <div v-if="current === 1" class="steps-content">
+        <!--步骤栏中内容-->
+        <div v-if="current === 1 | current === 2" class="steps-content">
           {{ steps[current].content }}
         </div>
 
+        <!--步骤按钮-->
         <div class="steps-action">
-          <a-button v-if="current > 0" style="margin-right: 8px" @click="prev">
+          <a-button v-if="current > 0" style="margin-right: 8px" @click="prevStep">
             上一步
           </a-button>
-          <a-button v-if="current < steps.length - 1" type="primary" @click="next">
+          <a-button v-if="current < steps.length - 1" type="primary" @click="nextStep">
             下一步
           </a-button>
           <a-button
             v-if="current === steps.length - 1"
             type="primary"
-            @click="$message.success('Processing complete!')"
+            @click="clickDone"
           >
             完成
           </a-button>
@@ -143,19 +146,22 @@
         current: 0,
         steps: [
           {
+            key:0,
             title: '上传险情',
             content: '上传险情命令文件到后端',
-            icon:'smile'
+            icon:'cloud-upload'
           },
           {
+            key:1,
             title: '险情预览',
             content: '后端通过ocr/语音/正则/分词 识别读取险情内容',
-            icon:'smile'
+            icon:'eye'
           },
           {
+            key:2,
             title: '解析险情',
             content: '通过定义的规则文件，确认险情的等级/子任务等',
-            icon:'smile'
+            icon:'rocket'
           },
         ],
       };
@@ -182,11 +188,16 @@
         console.log('onChange:', current);
         this.current = current;
       },
-      next() {
+      nextStep() {
         this.current++;
       },
-      prev() {
+      prevStep() {
         this.current--;
+      },
+      clickDone(){
+        this.current = 0
+        this.$message.success('险情上传成功!')
+        this.emergencyUploadModal = false
       },
       // upload file change
       handleChange(info) {
@@ -208,7 +219,11 @@
         this.$message.success(`${file.name} file uploaded successfully.`);
         this.current += 1
         return true
-      }
+      },
+      recordVocal(){
+        this.emergencyUploadModal=false
+        console.log('点击录音')
+      },
     },
   }
 </script>
