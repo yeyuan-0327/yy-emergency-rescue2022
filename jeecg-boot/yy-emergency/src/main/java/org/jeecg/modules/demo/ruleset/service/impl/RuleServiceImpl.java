@@ -3,7 +3,7 @@ package org.jeecg.modules.demo.ruleset.service.impl;
 import com.rule.rulemodal.Person;
 import org.jeecg.modules.demo.ruleset.entity.InsuranceInfo;
 import org.jeecg.modules.demo.ruleset.service.IRuleService;
-import org.jeecg.modules.demo.ruleset.utils.KieSessionUtils;
+import org.jeecg.modules.demo.utils.KieSessionUtils;
 import org.kie.api.runtime.KieSession;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,7 +17,7 @@ import java.util.List;
  */
 @Service
 public class RuleServiceImpl implements IRuleService {
-    private final static String ROOTPATH = "/Users/yuanye/Documents/yy-paper2022/ant-design-vue-jeecg/public/file/";
+    private final static String ROOT_PATH = "/Users/yuanye/Documents/yy-paper2022/ant-design-vue-jeecg/public/file/";
     public List<String> insuranceInfoCheck(InsuranceInfo insuranceInfo) throws Exception{
         String filePath = "/Users/yuanye/Documents/yy-paper2022/jeecg-boot/yy-emergency/src/main/resources/insuranceInfoCheck.xls";
         KieSession session = KieSessionUtils.getKieSessionFromXLS(filePath);
@@ -61,7 +61,7 @@ public class RuleServiceImpl implements IRuleService {
     public String ruleUploadExcel(MultipartFile[] multipartFiles) throws Exception{
         String savePath = "";
         for (MultipartFile i :multipartFiles){
-            savePath = ROOTPATH + i.getOriginalFilename();
+            savePath = ROOT_PATH + i.getOriginalFilename();
             System.out.println("上传的文件：" + i.getName() + "," + i.getContentType() + "," + i.getOriginalFilename()
                             +"，保存的路径为：" + savePath);
             i.transferTo(new File(savePath));

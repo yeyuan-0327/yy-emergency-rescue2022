@@ -1,8 +1,9 @@
-package org.jeecg.modules.demo.ruleset.utils;
+package org.jeecg.modules.demo.utils;
 
 import org.drools.core.io.impl.UrlResource;
 import org.drools.decisiontable.InputType;
 import org.drools.decisiontable.SpreadsheetCompiler;
+import org.jeecg.modules.demo.emergencycompile.entity.Emergency;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieModule;
 import org.kie.api.builder.KieRepository;
@@ -28,16 +29,15 @@ public class KieSessionUtils {
 
     }
     // 把xls文件解析为String
-    public static String getDRL (String realPath) throws FileNotFoundException {
+    private static String getDRL(String realPath) throws FileNotFoundException {
         File file = new File(realPath); // 例如：C:\\abc.xls
         InputStream is = new FileInputStream(file);
         SpreadsheetCompiler compiler = new SpreadsheetCompiler();
-        String drl = compiler.compile(is, InputType.XLS);
-        return drl;
+        return compiler.compile(is, InputType.XLS);
     }
 
     // drl为含有内容的字符串
-    public static KieSession createKieSessionFromDRL(String drl) throws Exception{
+    private static KieSession createKieSessionFromDRL(String drl) throws Exception{
         KieHelper kieHelper = new KieHelper();
         kieHelper.addContent(drl, ResourceType.DRL);
         Results results = kieHelper.verify();
@@ -95,5 +95,16 @@ public class KieSessionUtils {
         //基于KieModule模块创建容器对象，从容器中可以获取session会话
         KieContainer kieContainer = kieServices.newKieContainer(kieModule.getReleaseId());
         return kieContainer.newKieSession();
+    }
+
+    // 通过解析后传递过来的险情对象返回险情等级
+    public static void ruleFireFindLevel(Emergency em){
+        KieServices kieServices = KieServices.Factory.get();
+        KieContainer kieClasspathContainer = kieServices.getKieClasspathContainer();
+        KieSession kieSession = kieClasspathContainer.newKieSession();
+        kieSession.getAgenda().getAgendaGroup(em.getEmergencyType()).setFocus();
+        kieSession.insert(em);
+        kieSession.fireAllRules();
+        kieSession.dispose();
     }
 }

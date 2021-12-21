@@ -25,5 +25,6 @@ export const ruleBaseSet = {
 }
 
 export const emergencyCompile={
-
+  //emergency upload pdf
+  uploadPdf:'/emergencyCompile/emergencyUpload/uploadEmergencyFile'
 }

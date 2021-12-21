@@ -208,14 +208,14 @@
       // compile file and return value
       compileFile(file){
         console.log(file)
-        let urpApi = "";
+        let urpApi = emergencyCompile.uploadPdf;
         let formData = new FormData();
         formData.append("multipartFiles", file);
-        // uploadAction(urpApi,formData).then((res)=>{
-        //   if (res.success){
-        //     console.log(res.result)
-        //   }
-        // })
+        uploadAction(urpApi,formData).then((res)=>{
+          if (res.success){
+            console.log(res.result)
+          }
+        })
         this.$message.success(`${file.name} file uploaded successfully.`);
         this.current += 1
         return true
