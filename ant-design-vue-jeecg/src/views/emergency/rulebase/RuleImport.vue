@@ -70,8 +70,8 @@
           />
         </a-form-model-item>
         <a-form-model-item label="所属险情" prop="emergency_type">
-          <a-select v-model="form.emergency_type" placeholder="请输入该规则的归属险情类别">
-<!--        预留接口 可以从接口中获取到险情类别-->
+          <a-select v-model="form.emergency_type" placeholder="请输入该规则的归属任务类别">
+<!--        预留接口 可以从接口中获取到任务类别-->
             <a-select-option value="社会动员">
               社会动员
             </a-select-option>
