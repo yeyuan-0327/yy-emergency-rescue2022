@@ -4,7 +4,7 @@
     <insert id="ruleUploadDB" parameterType="org.jeecg.modules.demo.ruleset.entity.Rule"
             keyProperty="id" useGeneratedKeys="true">
     INSERT INTO rule_table()
-    VALUES (#{id},#{name},#{type},#{path}, #{meta}, #{emergency_type}, #{invalid_date}, #{update},#{delete_flag})
+    VALUES (#{id},#{name},#{type},#{path}, #{meta}, #{task_type}, #{invalid_date}, #{update},#{delete_flag})
     </insert>
 
     <select id="getRuleList" parameterType="java.lang.String" resultType="java.util.HashMap">

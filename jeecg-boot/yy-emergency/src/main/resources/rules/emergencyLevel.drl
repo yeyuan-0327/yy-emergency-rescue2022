@@ -1,5 +1,6 @@
 package com.rules
-import org.jeecg.modules.demo.emergencycompile.entity.Emergency;
+import org.jeecg.modules.demo.emergencycompile.entity.Emergency
+import java.util.ArrayList;
 
 rule "事故灾难：一般事故"
     activation-group "事故灾难"
@@ -9,6 +10,7 @@ rule "事故灾难：一般事故"
                      (0< injuryNum && injuryNum <= 10) )
     then
         $e.setEmergencyLevel("4");
+        $e.getTaskList().add("社会动员");
         update($e)
         System.out.println("事故灾难：一般事故");
     end
@@ -21,6 +23,9 @@ rule "事故灾难：较大事故"
                      (10 < injuryNum && injuryNum <= 50) )
     then
         $e.setEmergencyLevel("3");
+        $e.getTaskList().add("社会动员");
+        $e.getTaskList().add("治安维护");
+        $e.getTaskList().add("医疗救护");
         update($e)
         System.out.println("事故灾难：较大事故");
     end
@@ -33,6 +38,11 @@ rule "事故灾难：重大事故"
                      (50 < injuryNum && injuryNum <= 100) )
     then
         $e.setEmergencyLevel("2");
+        $e.getTaskList().add("社会动员");
+        $e.getTaskList().add("治安维护");
+        $e.getTaskList().add("医疗救护");
+        $e.getTaskList().add("重型设备");
+        $e.getTaskList().add("物资保障");
         update($e)
         System.out.println("事故灾难：重大事故");
     end
@@ -45,6 +55,13 @@ rule "事故灾难：特别重大事故"
                      (100 < injuryNum) )
     then
         $e.setEmergencyLevel("1");
+        $e.getTaskList().add("社会动员");
+        $e.getTaskList().add("治安维护");
+        $e.getTaskList().add("医疗救护");
+        $e.getTaskList().add("重型设备");
+        $e.getTaskList().add("物资保障");
+        $e.getTaskList().add("人员庇护");
+        $e.getTaskList().add("应急队伍");
         update($e)
         System.out.println("事故灾难：特别重大事故");
     end

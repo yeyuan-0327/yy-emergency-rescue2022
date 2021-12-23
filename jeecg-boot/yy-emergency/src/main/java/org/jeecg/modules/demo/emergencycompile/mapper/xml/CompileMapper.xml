@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.demo.emergencycompile.mapper.CompileMapper">
+    <insert id="writeEmergency" parameterType="org.jeecg.modules.demo.emergencycompile.entity.Emergency"
+            keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO affair.emergency()
+        VALUES (#{id},#{name},#{emergencyType},#{emergencyLevel},#{address},
+        #{content},#{state},#{time},#{taskAllocation},#{deathNum},#{injuryNum},#{lossNum})
+    </insert>
+
+    <insert id="writeTask" parameterType="org.jeecg.modules.demo.emergencycompile.entity.Task"
+            keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO affair.task()
+        VALUES (#{id},#{name})
+    </insert>
+
+    <insert id="writeEmergencyTaskRelation" parameterType="org.jeecg.modules.demo.emergencycompile.entity.Relation"
+            keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO affair.emergency_task()
+        VALUES (#{id},#{emergency_id},#{task_id})
+    </insert>
+
+    <select id="getEmergencyList" parameterType="java.lang.String" resultType="java.util.HashMap">
+        SELECT * FROM affair.emergency;
+    </select>
+
+    <select id="getTaskList" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT t.name FROM affair.emergency_task as e , affair.task as t
+        WHERE e.emergency_id='${id}' AND e.task_id=t.id;
+    </select>
+</mapper>

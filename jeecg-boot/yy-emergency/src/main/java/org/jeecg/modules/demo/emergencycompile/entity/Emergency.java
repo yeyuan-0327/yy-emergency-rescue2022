@@ -1,8 +1,11 @@
 package org.jeecg.modules.demo.emergencycompile.entity;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class Emergency {
+    private Integer id;
     private String name;
     private String emergencyType;
     private String emergencyLevel;
@@ -13,9 +16,11 @@ public class Emergency {
     private boolean death;
     private boolean injury;
     private boolean loss;
+    private String taskAllocation;
     private int deathNum;
     private int injuryNum;
     private int lossNum;
+    private List<String> taskList = new ArrayList<>();
 
     public Emergency() {
     }
@@ -23,7 +28,8 @@ public class Emergency {
     @Override
     public String toString() {
         return "Emergency{" +
-                "name='" + name + '\'' +
+                "id=" + id +
+                ", name='" + name + '\'' +
                 ", emergencyType='" + emergencyType + '\'' +
                 ", emergencyLevel='" + emergencyLevel + '\'' +
                 ", address='" + address + '\'' +
@@ -36,7 +42,17 @@ public class Emergency {
                 ", deathNum=" + deathNum +
                 ", injuryNum=" + injuryNum +
                 ", lossNum=" + lossNum +
+                ", taskAllocation='" + taskAllocation + '\'' +
+                ", taskList=" + taskList +
                 '}';
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -143,7 +159,24 @@ public class Emergency {
         this.lossNum = lossNum;
     }
 
-    public Emergency(String name, String emergencyType, String emergencyLevel, String address, String content, String state, Date time, boolean death, boolean injury, boolean loss, int deathNum, int injuryNum, int lossNum) {
+    public String getTaskAllocation() {
+        return taskAllocation;
+    }
+
+    public void setTaskAllocation(String taskAllocation) {
+        this.taskAllocation = taskAllocation;
+    }
+
+    public List<String> getTaskList() {
+        return taskList;
+    }
+
+    public void setTaskList(List<String> taskList) {
+        this.taskList = taskList;
+    }
+
+    public Emergency(Integer id, String name, String emergencyType, String emergencyLevel, String address, String content, String state, Date time, boolean death, boolean injury, boolean loss, int deathNum, int injuryNum, int lossNum, String taskAllocation, List<String> taskList) {
+        this.id = id;
         this.name = name;
         this.emergencyType = emergencyType;
         this.emergencyLevel = emergencyLevel;
@@ -157,5 +190,7 @@ public class Emergency {
         this.deathNum = deathNum;
         this.injuryNum = injuryNum;
         this.lossNum = lossNum;
+        this.taskAllocation = taskAllocation;
+        this.taskList = taskList;
     }
 }

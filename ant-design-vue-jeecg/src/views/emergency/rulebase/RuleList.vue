@@ -67,8 +67,8 @@
         <a-form-model-item label="规则名称" required>
           {{rule.name}}
         </a-form-model-item>
-        <a-form-model-item label="所属险情" required>
-          {{rule.emergency_type}}
+        <a-form-model-item label="所属任务类型" required>
+          {{rule.task_type}}
         </a-form-model-item>
         <a-form-model-item label="规则类型" required>
           <span v-show="rule.type==='Jar'">
@@ -129,7 +129,7 @@
           {
             title: '所属险情',
             align:"center",
-            dataIndex: 'emergency_type',
+            dataIndex: 'task_type',
           },
           {
             title: '生效时间',
@@ -180,7 +180,7 @@
             type: "",
             path: "",
             meta: "",
-            emergency_type:"",
+            task_type:"",
           }
         ],
       }
@@ -227,7 +227,7 @@
         this.rule.type=record.type;
         this.rule.path=record.path;
         this.rule.meta=record.meta;
-        this.rule.emergency_type=record.emergency_type;
+        this.rule.task_type=record.task_type;
         this.invalid_date=record.invalid_date;
       },
       //详情关闭按钮

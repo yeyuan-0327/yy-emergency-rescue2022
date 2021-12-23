@@ -98,13 +98,17 @@ public class KieSessionUtils {
     }
 
     // 通过解析后传递过来的险情对象返回险情等级
-    public static void ruleFireFindLevel(Emergency em){
-        KieServices kieServices = KieServices.Factory.get();
-        KieContainer kieClasspathContainer = kieServices.getKieClasspathContainer();
-        KieSession kieSession = kieClasspathContainer.newKieSession();
+    public static void ruleFireFindLevelTask(Emergency em){
+        KieSession kieSession = defaultKieSession();
         kieSession.getAgenda().getAgendaGroup(em.getEmergencyType()).setFocus();
         kieSession.insert(em);
         kieSession.fireAllRules();
         kieSession.dispose();
+    }
+
+    private static KieSession defaultKieSession(){
+        KieServices kieServices = KieServices.Factory.get();
+        KieContainer kieClasspathContainer = kieServices.getKieClasspathContainer();
+        return kieClasspathContainer.newKieSession();
     }
 }

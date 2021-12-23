@@ -1,15 +1,16 @@
 package com.emergencyCompile;
 
 import com.huaban.analysis.jieba.JiebaSegmenter;
-import com.modal.ComparisonOperatorEntity;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.text.PDFTextStripperByArea;
 import org.jeecg.modules.demo.emergencycompile.entity.Emergency;
+import org.jeecg.modules.demo.emergencycompile.mapper.CompileMapper;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -94,6 +95,7 @@ public class TestEmergencyCompile {
             }
             em.setContent(line);
             em.setTime(new Date());
+            em.setTaskAllocation("系统推荐");
             ruleFireFindLevel(em);
             System.out.println(em);
         }
@@ -153,25 +155,6 @@ public class TestEmergencyCompile {
 
     }
 
-    @Test
-    public void test3(){
-        KieServices kieServices = KieServices.Factory.get();
-        KieContainer kieClasspathContainer = kieServices.getKieClasspathContainer();
-        KieSession kieSession = kieClasspathContainer.newKieSession("KSession-rule");
-
-        ComparisonOperatorEntity comparisonOperatorEntity = new ComparisonOperatorEntity();
-        comparisonOperatorEntity.setNames("张三");
-        List<String> list = new ArrayList<>();
-        list.add("张三");
-        list.add("李四");
-        comparisonOperatorEntity.setList(list);
-
-        //将数据提供给规则引擎，规则引擎会根据提供的数据进行规则匹配，如果规则匹配成功则执行规则
-        kieSession.insert(comparisonOperatorEntity);
-
-        kieSession.fireAllRules();
-        kieSession.dispose();
-    }
 
     private static void ruleFireFindLevel(Emergency em){
         KieServices kieServices = KieServices.Factory.get();
@@ -181,5 +164,13 @@ public class TestEmergencyCompile {
         kieSession.insert(em);
         kieSession.fireAllRules();
         kieSession.dispose();
+    }
+
+    @Autowired
+    CompileMapper compileMapper;
+    @Test
+    public void test03(){
+        List<Map<String, Object>> emergencyList = compileMapper.getEmergencyList();
+        System.out.println(emergencyList);
     }
 }

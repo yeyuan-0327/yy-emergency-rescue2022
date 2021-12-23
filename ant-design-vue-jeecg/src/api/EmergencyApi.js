@@ -26,5 +26,9 @@ export const ruleBaseSet = {
 
 export const emergencyCompile={
   //emergency upload pdf
-  uploadPdf:'/emergencyCompile/emergencyUpload/uploadEmergencyFile'
+  uploadPdf:'/emergencyCompile/emergencyUpload/uploadEmergencyFile',
+  // confirm level and task
+  ruleFireLevelTask:'/emergencyCompile/emergencyUpload/ruleFireLevelTask',
+  confirmEmergencyTaskPublish:'/emergencyCompile/emergencyUpload/confirmEmergencyTaskPublish',
+  emergencyList:'/emergencyCompile/emergencyUpload/emergencyList',
 }

@@ -69,8 +69,8 @@
         "
           />
         </a-form-model-item>
-        <a-form-model-item label="所属险情" prop="emergency_type">
-          <a-select v-model="form.emergency_type" placeholder="请输入该规则的归属任务类别">
+        <a-form-model-item label="所属任务" prop="task_type">
+          <a-select v-model="form.task_type" placeholder="请输入该规则的归属任务类别">
 <!--        预留接口 可以从接口中获取到任务类别-->
             <a-select-option value="社会动员">
               社会动员
@@ -177,7 +177,7 @@
         ruleType: '',
         form: {
           name: '',
-          emergency_type: undefined,
+          task_type: undefined,
           invalid_date: undefined,
           path: '',
           meta: ''
@@ -187,7 +187,7 @@
             { required: true, message: '请输入规则名称', trigger: 'blur' },
             { min: 2, max: 20, message: '长度应该在2到20之间', trigger: 'blur' },
           ],
-          emergency_type: [{ required: true, message: '请选择所属险情类别', trigger: 'change' }],
+          task_type: [{ required: true, message: '请选择所属任务类别', trigger: 'change' }],
           invalid_date: [{ required: true, message: '请选择失效时间', trigger: 'change' }],
           path: [
             { required: true, message: '请引入规则链接', trigger: 'blur' },

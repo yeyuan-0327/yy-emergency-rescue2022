@@ -29,16 +29,34 @@
       :scroll="{x:true}"
       bordered
       rowKey="id"
-      :columns="columns"
-      :dataSource="dataSource"
+      :columns="emergencyColumns"
+      :dataSource="emergencyDataSource"
       :pagination="paginationOpt"
       :loading="loading"
       class="j-table-force-nowrap">
-
-        <span slot="action" slot-scope="text, record">
-          <a @click="clickEmergencyToShow(record)">详情</a>
-        </span>
+      <span slot="emergency_level"
+            slot-scope="tag">
+        <a-tag
+          :key="tag"
+          :color="tag === 1 ? 'red' : tag === 2 ? 'orange' : tag === 3? 'yellow':'blue'"
+        >
+        {{ tag }}
+      </a-tag>
+      </span>
+      <span slot="task_list" slot-scope="tags">
+      <a-tag
+        v-for="tag in tags"
+        :key="tag"
+        :color="tag === 'loser' ? 'volcano' : tag.length > 5 ? 'geekblue' : 'green'"
+      >
+        {{ tag.substring(0,1) }}
+      </a-tag>
+    </span>
+      <span slot="action" slot-scope="text, record">
+        <a @click="clickEmergencyToShow(record)">详情</a>
+      </span>
     </a-table>
+    <!-- 弹框区域  -->
     <a-modal v-model="emergencyUploadModal"
              :title="emergencyUploadModalTitle"
              switchFullscreen
@@ -79,7 +97,7 @@
         </div>
         <!--步骤栏2中内容-->
         <div v-if="current === 1" class="steps-content">
-          <a-spin :spinning="spinning">
+          <a-spin :spinning="emergency.spinning">
             <a-form-model v-model="emergency" :label-col="labelCol" :wrapper-col="wrapperCol">
               <a-form-model-item label="险情名称" >
                 <a-input v-model="emergency.name" />
@@ -115,71 +133,75 @@
         </div>
         <!--步骤栏3中内容-->
         <div v-if="current === 2" class="steps-content">
-          <a-form-model :model="form" :label-col="labelCol" :wrapper-col="wrapperCol">
-            <a-form-model-item label="Activity name">
-              <a-input v-model="form.name" />
-            </a-form-model-item>
-            <a-form-model-item label="Activity zone">
-              <a-select v-model="form.region" placeholder="please select your zone">
-                <a-select-option value="shanghai">
-                  Zone one
-                </a-select-option>
-                <a-select-option value="beijing">
-                  Zone two
-                </a-select-option>
-              </a-select>
-            </a-form-model-item>
-            <a-form-model-item label="Activity time">
-              <a-date-picker
-                v-model="form.date1"
-                show-time
-                type="date"
-                placeholder="Pick a date"
-                style="width: 100%;"
-              />
-            </a-form-model-item>
-            <a-form-model-item label="Instant delivery">
-              <a-switch v-model="form.delivery" />
-            </a-form-model-item>
-            <a-form-model-item label="Activity type">
-              <a-checkbox-group v-model="form.type">
-                <a-checkbox value="1" name="type">
-                  Online
-                </a-checkbox>
-                <a-checkbox value="2" name="type">
-                  Promotion
-                </a-checkbox>
-                <a-checkbox value="3" name="type">
-                  Offline
-                </a-checkbox>
-              </a-checkbox-group>
-            </a-form-model-item>
-            <a-form-model-item label="Resources">
-              <a-radio-group v-model="form.resource">
-                <a-radio value="1">
-                  Sponsor
-                </a-radio>
-                <a-radio value="2">
-                  Venue
-                </a-radio>
-              </a-radio-group>
-            </a-form-model-item>
-            <a-form-model-item label="Activity form">
-              <a-input v-model="form.desc" type="textarea" />
-            </a-form-model-item>
-          </a-form-model>
+          <a-spin :spinning="compileEmergency.spinning">
+            <a-form-model :model="compileEmergency" :label-col="labelCol" :wrapper-col="wrapperCol">
+              <a-form-model-item label="险情名称">
+                <a-input v-model="compileEmergency.name" disabled/>
+              </a-form-model-item>
+              <a-form-model-item label="险情类别">
+                <a-select v-model="compileEmergency.emergencyType" placeholder="请选择险情类别" disabled>
+                  <a-select-option value="自然灾害" >
+                    自然灾害
+                  </a-select-option>
+                  <a-select-option value="事故灾害">
+                    事故灾害
+                  </a-select-option>
+                </a-select>
+              </a-form-model-item>
+              <a-form-model-item label="上传时间">
+                <a-date-picker :value="moment(compileEmergency.time, 'YYYY-MM-DD')" disabled>
+                </a-date-picker>
+                <span style="margin-left: 20px">险情等级:</span>
+                <a-button type="dashed" disabled style="margin-left: 10px">{{compileEmergency.emergencyLevel}}级</a-button>
+              </a-form-model-item>
+              <a-form-model-item label="险情发生地点" >
+                <a-input v-model="compileEmergency.address" disabled/>
+              </a-form-model-item>
+              <a-form-model-item label="分配子任务方式">
+                <a-radio-group v-model="compileEmergency.taskAllocation">
+                  <a-radio value="系统推荐">
+                    系统推荐
+                  </a-radio>
+                  <a-radio value="人工选择">
+                    人工选择
+                  </a-radio>
+                </a-radio-group>
+              </a-form-model-item>
+              <a-form-model-item label="相关子任务">
+                <a-checkbox-group v-if="compileEmergency.taskAllocation === '系统推荐'" v-model="compileEmergency.taskList" disabled>
+                  <a-row>
+                    <a-col span="4" v-for="i in task_list" :key="i.task_name" >
+                      <a-checkbox :value="i.task_name" name="task" >
+                        {{i.task_name}}
+                      </a-checkbox>
+                    </a-col>
+                  </a-row>
+                </a-checkbox-group>
+                <a-checkbox-group v-else v-model="compileEmergency.taskList">
+                  <a-row>
+                    <a-col span="4" v-for="i in task_list" :key="i.task_name" >
+                      <a-checkbox :value="i.task_name" name="task" >
+                        {{i.task_name}}
+                      </a-checkbox>
+                    </a-col>
+                  </a-row>
+                </a-checkbox-group>
+              </a-form-model-item>
+
+            </a-form-model>
+          </a-spin>
         </div>
         <!--步骤按钮-->
         <div class="steps-action" >
           <a-button v-if="current > 0" style="margin-right: 8px" @click="prevStep">
             上一步
           </a-button>
-          <a-button v-if="current < steps.length - 1" type="primary" @click="nextStep">
+          <a-button v-if="current < steps.length - 1 && current !== 0" type="primary" @click="nextStep">
             下一步
           </a-button>
-<!--          <a-button v-if="current === 0" type="primary" @click="nextStep" disabled>-->
-<!--            下一步-->
-<!--          </a-button>-->
+          <a-button v-if="current === 0" type="primary" @click="nextStep" disabled>
+            下一步
+          </a-button>
           <a-button
             v-if="current === steps.length - 1"
             type="primary"
@@ -197,17 +219,61 @@
 <script>
   import {getAction, postAction,uploadAction} from "@/api/manage";
   import { emergencyCompile } from '@/api/EmergencyApi.js'
+  import moment from 'moment';
+  import ACol from 'ant-design-vue/es/grid/Col'
 
   export default {
     name: 'EmergencyUpload',
+    components: { ACol },
     data() {
       return {
         //搜索框
         searchEmergencyName:'',
         selectedRowKeys:[],
         //表格
-        columns:[],
-        dataSource:[],
+        emergencyColumns:[
+          {
+            title: 'ID',
+            dataIndex: 'id',
+            align:"center",
+          },
+          {
+            title: '险情名称',
+            align:"center",
+            dataIndex: 'name',
+          },
+          {
+            title: '险情类别',
+            align:"center",
+            dataIndex: 'emergency_type',
+          },
+          {
+            title: '险情等级',
+            align:"center",
+            dataIndex: 'emergency_level',
+            scopedSlots: {customRender: 'emergency_level'},
+          },
+          {
+            title: '发布时间',
+            align:"center",
+            dataIndex: 'time',
+          },
+          {
+            title: '子任务',
+            align:"center",
+            dataIndex: 'task_list',
+            scopedSlots: {customRender: 'task_list'},
+          },
+          {
+            title: '操作',
+            dataIndex: 'action',
+            align:"center",
+            fixed:"right",
+            width:100,
+            scopedSlots: { customRender: 'action' }
+          }
+        ],
+        emergencyDataSource:[],
         loading:false,
         //数据分页设置
         paginationOpt: {
@@ -244,19 +310,52 @@
           deathNum: 0,
           injuryNum:0,
           lossNum:0,
+          spinning:true,
         },
         // step 2
-        form: {
+        compileEmergency: {
           name: '',
-          region: undefined,
-          date1: undefined,
-          delivery: false,
-          type: [],
-          resource: '',
-          desc: '',
+          emergencyType: undefined,
+          time: moment(),
+          emergencyLevel:'',
+          taskList: [],
+          taskAllocation: '',
+          address:'',
+          spinning:true,
         },
-        // spinning
-        spinning:true,
+        // date
+        moment,
+        // task api
+        task_list:[
+          {
+            task_name : '社会动员'},
+          {
+            task_name : '治安维护'},
+          {
+            task_name : '医疗救护'},
+          {
+            task_name : '卫生防疫'},
+          {
+            task_name : '专业人才'},
+          {
+            task_name : '紧急驾驶'},
+          {
+            task_name : '物资保障'},
+          {
+            task_name : '重型设备'},
+          {
+            task_name : '饮食保障'},
+          {
+            task_name : '紧急运输'},
+          {
+            task_name : '人员搜救'},
+          {
+            task_name : '人员庇护'},
+          {
+            task_name : '应急队伍'},
+          {
+            task_name : '设备抢修'},
+        ],
         // step
         current: 0,
         steps: [
@@ -281,7 +380,18 @@
         ],
       };
     },
+    created(){
+      this.initEmergencyList()
+    },
     methods: {
+      initEmergencyList(){
+        let apiUrl = emergencyCompile.emergencyList
+        getAction(apiUrl).then((res)=>{
+          if (res.success){
+            this.emergencyDataSource = res.result
+          }
+        })
+      },
       //搜索框
       searchEmergencyQuery(){
 
@@ -308,12 +418,19 @@
       //modal step change
       nextStep() {
         this.current++;
+        if (this.current === 2 && this.emergency.name !== '')this.compileEmergencyLevelTask();
       },
       prevStep() {
         this.current--;
       },
       clickDone(){
-        this.current = 0
+        let apiUrl = emergencyCompile.confirmEmergencyTaskPublish
+        let postList = this.compileEmergency
+        postAction(apiUrl,postList).then((res)=>{
+          if (res.success){
+            this.initEmergencyList();
+          }
+        })
         this.$message.success('险情上传成功!')
         this.emergencyUploadModal = false
       },
@@ -330,19 +447,29 @@
         formData.append("multipartFiles", file);
         uploadAction(urpApi,formData).then((res)=>{
           if (res.success){
-            console.log(res.result)
-            this.emergency=res.result
-            this.spinning=false
+            this.emergency = res.result
+            this.emergency.spinning = false
           }
         })
         this.$message.success(`${file.name} 上传成功.`);
         this.current += 1
         return true
       },
+      //vocal
       recordVocal(){
         this.emergencyUploadModal=false
         console.log('点击录音')
       },
+      compileEmergencyLevelTask() {
+        let apiUrl = emergencyCompile.ruleFireLevelTask
+        let postList = this.emergency
+        postAction(apiUrl,postList).then((res)=>{
+          if (res.success){
+            this.compileEmergency=res.result;
+            this.compileEmergency.spinning=false;
+          }
+        })
+      }
     },
   }
 </script>
@@ -353,7 +480,6 @@
     border: 1px dashed #e9e9e9;
     border-radius: 6px;
     min-height: 300px;
-    text-align: center;
     padding-top: 10px;
   }
 
