@@ -54,7 +54,7 @@ public class EmergencyServiceImpl implements IEmergencyCompileService {
         // 创建子任务
         List<String> taskList = e.getTaskList();
         for (String i : taskList){
-            Task t = new Task(i);
+            Task t = new Task(i,0);
             compileMapper.writeTask(t);
             Relation r = new Relation(e.getId(),t.getId());
             compileMapper.writeEmergencyTaskRelation(r);
@@ -69,7 +69,6 @@ public class EmergencyServiceImpl implements IEmergencyCompileService {
         for (Map<String, Object> m : emergencyList){
             List<String> task_list = compileMapper.getTaskList((Integer) m.get("id"));
             m.put("task_list",task_list);
-            System.out.println(m);
             res.add(m);
         }
         return res;

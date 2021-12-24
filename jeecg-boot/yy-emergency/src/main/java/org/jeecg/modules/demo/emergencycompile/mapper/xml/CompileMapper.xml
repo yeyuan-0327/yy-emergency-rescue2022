@@ -11,7 +11,7 @@
     <insert id="writeTask" parameterType="org.jeecg.modules.demo.emergencycompile.entity.Task"
             keyProperty="id" useGeneratedKeys="true">
         INSERT INTO affair.task()
-        VALUES (#{id},#{name})
+        VALUES (#{id},#{name},#{statue})
     </insert>
 
     <insert id="writeEmergencyTaskRelation" parameterType="org.jeecg.modules.demo.emergencycompile.entity.Relation"
@@ -25,7 +25,7 @@
     </select>
 
     <select id="getTaskList" parameterType="java.lang.String" resultType="java.lang.String">
-        SELECT t.name FROM affair.emergency_task as e , affair.task as t
+        SELECT CONCAT(t.name,t.statue) FROM affair.emergency_task as e , affair.task as t
         WHERE e.emergency_id='${id}' AND e.task_id=t.id;
     </select>
 </mapper>

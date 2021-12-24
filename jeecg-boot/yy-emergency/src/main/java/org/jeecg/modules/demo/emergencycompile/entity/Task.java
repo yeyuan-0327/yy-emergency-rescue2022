@@ -3,12 +3,9 @@ package org.jeecg.modules.demo.emergencycompile.entity;
 public class Task {
     private Integer id;
     private String name;
+    private int statue;
 
     public Task() {
-    }
-
-    public Task(String name) {
-        this.name = name;
     }
 
     @Override
@@ -16,7 +13,19 @@ public class Task {
         return "Task{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
+                ", statue=" + statue +
                 '}';
+    }
+
+    public Task(String name, int statue) {
+        this.name = name;
+        this.statue = statue;
+    }
+
+    public Task(Integer id, String name, int statue) {
+        this.id = id;
+        this.name = name;
+        this.statue = statue;
     }
 
     public Integer getId() {
@@ -35,8 +44,11 @@ public class Task {
         this.name = name;
     }
 
-    public Task(Integer id, String name) {
-        this.id = id;
-        this.name = name;
+    public int getStatue() {
+        return statue;
+    }
+
+    public void setStatue(int statue) {
+        this.statue = statue;
     }
 }

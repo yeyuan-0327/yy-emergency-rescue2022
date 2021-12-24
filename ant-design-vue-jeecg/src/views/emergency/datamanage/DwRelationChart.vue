@@ -9,7 +9,7 @@
 
       <div v-show="showType === 'table'" >
       <a-table bordered
-               :scroll="{ x:10000, y: 400 }"
+               :scroll="{ x:2000 , y: 400 }"
                :columns="factTableColumns"
                :dataSource="factTableData"
                :loading="factTableLoading"

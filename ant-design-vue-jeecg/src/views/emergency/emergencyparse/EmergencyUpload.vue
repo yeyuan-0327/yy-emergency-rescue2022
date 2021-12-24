@@ -44,16 +44,17 @@
       </a-tag>
       </span>
       <span slot="task_list" slot-scope="tags">
-      <a-tag
-        v-for="tag in tags"
-        :key="tag"
-        :color="tag === 'loser' ? 'volcano' : tag.length > 5 ? 'geekblue' : 'green'"
-      >
-        {{ tag.substring(0,1) }}
-      </a-tag>
-    </span>
-      <span slot="action" slot-scope="text, record">
-        <a @click="clickEmergencyToShow(record)">详情</a>
+        <a-tag
+          v-for="tag in tags"
+          :key="tag + emergencyDataSource.id"
+          :color="tag.substr(-1) === '0' ? 'volcano' : 'green'">
+          <a-popover >
+            <template slot="content">
+              {{tag.substring(0,tag.length-1)}}{{tag.substr(-1) === '0'?'待完成':'已完成'}}
+            </template>
+              {{ tag.substring(0,1) }}
+          </a-popover>
+        </a-tag>
       </span>
     </a-table>
     <!-- 弹框区域  -->
@@ -76,7 +77,7 @@
           </a-step>
         </a-steps>
         <!--步骤栏1中内容-->
-        <div v-if="current === 0" style="margin-top: 30px;height: 300px;">
+        <div v-if="current === 0 && recordVocalFlag === false" style="margin-top: 30px;height: 300px;">
           <a-upload-dragger
             name="file"
             action=""
@@ -93,7 +94,23 @@
               支持Word文件和Wav语音文件，解析识别单个险情命令。
             </p>
           </a-upload-dragger>
-          <a-button @click="recordVocal" style="margin-top: 20px;" type="link">可录音</a-button>
+        </div>
+        <div v-if="current === 0 && recordVocalFlag === true" style="margin-top: 80px;min-height: 150px;">
+          <MRecorder @handleStop="handelEndRecord"></MRecorder>
+          <br>
+          <vue-audio-native
+            size="default"
+            :url="msource"
+            :showCurrentTime=showCurrentTime
+            :showControls=showControls
+            :showVolume=showVolume
+            :showDownload=showDownload
+            :autoplay=autoplay
+            :hint=hint
+            :waitBuffer=waitBuffer
+            :downloadName=downloadName
+          >
+          </vue-audio-native>
         </div>
         <!--步骤栏2中内容-->
         <div v-if="current === 1" class="steps-content">
@@ -193,6 +210,10 @@
         </div>
         <!--步骤按钮-->
         <div class="steps-action" >
+          <a-button v-if="current === 0 && recordVocalFlag === false"
+                    @click="uploadTypeChange" type="link">可录音</a-button>
+          <a-button v-if="current === 0 && recordVocalFlag === true" @click="uploadTypeChange" type="link">文件上传</a-button>
+
           <a-button v-if="current > 0" style="margin-right: 8px" @click="prevStep">
             上一步
           </a-button>
@@ -221,10 +242,16 @@
   import { emergencyCompile } from '@/api/EmergencyApi.js'
   import moment from 'moment';
   import ACol from 'ant-design-vue/es/grid/Col'
+  import ARow from 'ant-design-vue/es/grid/Row'
+  import MRecorder from '@/components/MRecorder'
 
   export default {
     name: 'EmergencyUpload',
-    components: { ACol },
+    components: {
+      ARow,
+      ACol,
+      MRecorder,
+    },
     data() {
       return {
         //搜索框
@@ -250,12 +277,14 @@
           {
             title: '险情等级',
             align:"center",
+            sorter:(a, b) => a.emergency_level - b.emergency_level,
             dataIndex: 'emergency_level',
             scopedSlots: {customRender: 'emergency_level'},
           },
           {
             title: '发布时间',
             align:"center",
+            sorter:(a, b) =>  new Date(a.time).getTime() - new Date(b.time).getTime(),
             dataIndex: 'time',
           },
           {
@@ -264,14 +293,6 @@
             dataIndex: 'task_list',
             scopedSlots: {customRender: 'task_list'},
           },
-          {
-            title: '操作',
-            dataIndex: 'action',
-            align:"center",
-            fixed:"right",
-            width:100,
-            scopedSlots: { customRender: 'action' }
-          }
         ],
         emergencyDataSource:[],
         loading:false,
@@ -301,6 +322,17 @@
         // form
         labelCol: { span: 5 },
         wrapperCol: { span: 14 },
+        // step 0 vocal
+        recordVocalFlag:false,
+        msource: "",
+        showCurrentTime: true, //默认true，是否显示当前播放时间
+        showControls: false, //默认false，true:展示原生音频播放控制条，false：展示模拟播放控制条
+        showVolume: true, //默认true，默认显示音量调节和静音按钮 true显示音量调节和静音按钮
+        showDownload: true, //默认true，默认显示下载按钮
+        autoplay: false, //默认false，自动播放有效音频(由于高版本浏览器协议限制，初始化页面时无法自动播放，可以在点击页面后手动触发)
+        waitBuffer:true,//默认true，拖拽到未加载的时间，是否需要等待加载，true:滑块位置不动，等待加载音频资源后播放，false：当滑动位置大于当前缓冲的最大位置，则重置到当前最大缓冲位置
+        downloadName:"下载音频",//默认“下载音频”，在Chrome和火狐、同域名下，修改下载文件名称，其它保持原文件服务器名称
+        hint: "请录制险情音频录音文件，录制成功后点击下一步", //无音频情况下提示文案
         // step 1
         emergency: {
           name: '',
@@ -394,10 +426,15 @@
       },
       //搜索框
       searchEmergencyQuery(){
-
+        if (this.emergencyDataSource && this.searchEmergencyName !== '') {
+          this.emergencyDataSource = this.emergencyDataSource.filter(
+            (p) => p.name.indexOf(this.searchEmergencyName) !== -1
+          )
+        }
       },
       searchEmergencyReset(){
-
+        this.searchEmergencyName = ''
+        this.initEmergencyList()
       },
       // 新增按钮
       handleAddEmergency(){
@@ -407,10 +444,6 @@
         // 加载置true
         this.spinning=true
         this.emergencyUploadModal=true
-      },
-      //详情按钮
-      clickEmergencyToShow(){
-
       },
       //input number
       onNumberChange(value){
@@ -456,10 +489,16 @@
         return true
       },
       //vocal
-      recordVocal(){
-        this.emergencyUploadModal=false
+      uploadTypeChange(){
+        this.recordVocalFlag=!this.recordVocalFlag
         console.log('点击录音')
       },
+      // 处理vocal结束事件
+      handelEndRecord(param) {
+        console.log(param)
+        this.msource = param.url
+      },
+      // conform level
       compileEmergencyLevelTask() {
         let apiUrl = emergencyCompile.ruleFireLevelTask
         let postList = this.emergency
