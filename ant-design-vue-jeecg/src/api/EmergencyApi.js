@@ -31,4 +31,7 @@ export const emergencyCompile={
   ruleFireLevelTask:'/emergencyCompile/emergencyUpload/ruleFireLevelTask',
   confirmEmergencyTaskPublish:'/emergencyCompile/emergencyUpload/confirmEmergencyTaskPublish',
   emergencyList:'/emergencyCompile/emergencyUpload/emergencyList',
+  getEmergencyByType:'/emergencyCompile/taskCreate/getEmergenciesByType',
+  getEmergencyById:'/emergencyCompile/taskCreate/getEmergencyById',
+  writeTask:'/emergencyCompile/taskCreate/writeTask',
 }

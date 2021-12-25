@@ -54,10 +54,7 @@ public class EmergencyServiceImpl implements IEmergencyCompileService {
         // 创建子任务
         List<String> taskList = e.getTaskList();
         for (String i : taskList){
-            Task t = new Task(i,0);
-            compileMapper.writeTask(t);
-            Relation r = new Relation(e.getId(),t.getId());
-            compileMapper.writeEmergencyTaskRelation(r);
+            taskAndRelationWrite(i,e.getId());
         }
         return e.getId();
     }
@@ -72,5 +69,33 @@ public class EmergencyServiceImpl implements IEmergencyCompileService {
             res.add(m);
         }
         return res;
+    }
+
+    @Override
+    public List<Map<String, Object>> getEmergenciesByType(List<String> postList) {
+        String type = postList.get(0);
+        return compileMapper.getEmergenciesByType(type);
+    }
+
+    @Override
+    public Object getEmergencyById(List<String> postList) {
+        String id = postList.get(0);
+        Emergency em  = compileMapper.getEmergencyById(id);
+        return em;
+    }
+
+    @Override
+    public int writeTask(LinkedHashMap<String,Object> postList) {
+        String name = (String) postList.get("name");
+        Integer eId = Integer.parseInt((String) postList.get("emergency_id"));
+        return taskAndRelationWrite(name,eId);
+    }
+
+    private int taskAndRelationWrite(String name,Integer emergencyId){
+        Task t = new Task(name,0);
+        compileMapper.writeTask(t);
+        Relation r = new Relation(emergencyId,t.getId());
+        compileMapper.writeEmergencyTaskRelation(r);
+        return t.getId();
     }
 }

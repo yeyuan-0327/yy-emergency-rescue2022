@@ -22,17 +22,6 @@
               </a-card-meta>
             </a-card>
           </div>
-          <!--            <a-card v-for="task in task_list" :key="task.name"-->
-          <!--                    hoverable-->
-          <!--                    style="height: 150px;width: 150px">-->
-          <!--              <img-->
-          <!--                style="margin-top: -10px;margin-left: 5px"-->
-          <!--                alt="task"-->
-          <!--                src="@/assets/task.png"-->
-          <!--              />-->
-          <!--              <a-card-meta :title="task.name" style="margin-top: 10px;margin-left: 15px">-->
-          <!--              </a-card-meta>-->
-          <!--            </a-card>-->
         </a-space>
       </a-tab-pane>
     </a-tabs>
@@ -40,60 +29,64 @@
              :title="taskCreateModalTitle"
              switchFullscreen
              okText="创建"
-             @ok="onTaskSubmit"
+             @ok="onSubmit"
              @cancel="onTaskCancel"
              :width="1000">
-      <a-form-model :model="form" :label-col="labelCol" :wrapper-col="wrapperCol">
-        <a-form-model-item label="Activity name">
-          <a-input v-model="form.name" />
-        </a-form-model-item>
-        <a-form-model-item label="Activity zone">
-          <a-select v-model="form.region" placeholder="please select your zone">
-            <a-select-option value="shanghai">
-              Zone one
-            </a-select-option>
-            <a-select-option value="beijing">
-              Zone two
-            </a-select-option>
-          </a-select>
-        </a-form-model-item>
-        <a-form-model-item label="Activity time">
-          <a-date-picker
-            v-model="form.date1"
-            show-time
-            type="date"
-            placeholder="Pick a date"
-            style="width: 100%;"
+      <a-form-model
+        ref="taskForm"
+        :model="task"
+        :rules="rules"
+        :label-col="labelCol"
+        :wrapper-col="wrapperCol"
+      >
+        <a-form-model-item ref="name" label="任务名称" prop="name">
+          <a-input
+            v-model="task.name"
+            @blur="
+          () => {
+            $refs.name.onFieldBlur();
+          }
+        "
           />
         </a-form-model-item>
-        <a-form-model-item label="Instant delivery">
-          <a-switch v-model="form.delivery" />
-        </a-form-model-item>
-        <a-form-model-item label="Activity type">
-          <a-checkbox-group v-model="form.type">
-            <a-checkbox value="1" name="type">
-              Online
+        <a-form-model-item label="所属险情类型" prop="emergency_type">
+          <a-checkbox-group v-model="task.emergency_type" @change="emergencyTypeCheckBox">
+            <a-checkbox value="自然灾害" name="emergency_type">
+                自然灾害
             </a-checkbox>
-            <a-checkbox value="2" name="type">
-              Promotion
+            <a-checkbox value="事故灾难" name="emergency_type">
+                事故灾难
             </a-checkbox>
-            <a-checkbox value="3" name="type">
-              Offline
+            <a-checkbox value="公共卫生事件" name="emergency_type">
+                公共卫生事件
+            </a-checkbox>
+            <a-checkbox value="社会安全事件" name="emergency_type">
+                社会安全事件
             </a-checkbox>
           </a-checkbox-group>
         </a-form-model-item>
-        <a-form-model-item label="Resources">
-          <a-radio-group v-model="form.resource">
-            <a-radio value="1">
-              Sponsor
-            </a-radio>
-            <a-radio value="2">
-              Venue
-            </a-radio>
-          </a-radio-group>
+        <a-form-model-item label="险情名称" prop="emergency_id">
+          <a-select v-model="task.emergency" @select="emergencyIdSelect">
+            <a-select-option
+              v-for="e in emergencySelectList"
+              :key = "e.id"
+              :value="e">
+              {{e.name}}
+            </a-select-option>
+          </a-select>
         </a-form-model-item>
-        <a-form-model-item label="Activity form">
-          <a-input v-model="form.desc" type="textarea" />
+        <a-form-model-item label="上传时间">
+          <a-date-picker :value="moment(emergency.time, 'YYYY-MM-DD')" disabled>
+          </a-date-picker>
+          <span style="margin-left: 20px">险情等级:</span>
+          <a-button
+            type="dashed" disabled style="margin-left: 10px;margin-top: 3px">{{emergency.emergencyLevel}}</a-button>
+        </a-form-model-item>
+        <a-form-model-item label="险情发生地点" >
+          <a-input v-model="emergency.address" disabled/>
+        </a-form-model-item>
+        <a-form-model-item label="险情内容">
+          <a-input v-model="emergency.content" :auto-size="{ minRows: 5 }" type="textarea" disabled/>
         </a-form-model-item>
       </a-form-model>
     </a-modal>
@@ -101,6 +94,10 @@
 </template>
 
 <script>
+  import moment from 'moment';
+  import {getAction, postAction,uploadAction} from "@/api/manage";
+  import { emergencyCompile } from '@/api/EmergencyApi.js'
+
   export default {
     name: 'TaskCreate',
     data() {
@@ -159,30 +156,106 @@
         //form modal
         labelCol: { span: 4 },
         wrapperCol: { span: 14 },
-        form: {
+        task: {
           name: '',
-          region: undefined,
-          date1: undefined,
-          delivery: false,
-          type: [],
-          resource: '',
-          desc: '',
+          emergency_type: [],
+          emergency:'',
+          emergency_id:'',
         },
+        rules: {
+          name: [
+            { required: true, message: '请输入任务名称', trigger: 'blur' },
+            { min: 4, max: 20, message: '长度应该为4到20', trigger: 'blur' },
+          ],
+          emergency: [{ required: true, message: '请选择所属险情', trigger: 'change' }],
+          emergency_type: [
+            {
+              type: 'array',
+              required: true,
+              message: '请选择一项所属险情类型',
+              trigger: 'change',
+            },
+          ],
+        },
+        emergency:{
+          id:'',
+          name:'',
+          time: moment(),
+          emergencyLevel:'',
+          address:'',
+          content:''
+        },
+        emergencySelectList:[],
+        moment,
       };
     },
     methods: {
       taskClick(record){
         this.taskCreateModal=true
         this.taskCreateModalTitle=record[0].name
-        console.log("点击了任务创建")
+        // clear all
+        this.clearData()
+        this.task.name=record[0].name
       },
-      onTaskSubmit() {
-        this.$message.success('任务创建成功!')
-        this.taskCreateModal=false
+      //多选框单选
+      emergencyTypeCheckBox(){
+        // 清空单选框选项内容 重新读取
+        this.task.emergency_id=''
+        // 多选框单选
+        this.task.emergency_type = [this.task.emergency_type[this.task.emergency_type.length-1]]
+        // 加载单选框内容
+        let apiUrl = emergencyCompile.getEmergencyByType
+        postAction(apiUrl,this.task.emergency_type).then((res)=>{
+          if (res.success){
+            this.emergencySelectList=res.result
+          }
+        })
+      },
+      //
+      emergencyIdSelect(value){
+        let apiUrl = emergencyCompile.getEmergencyById
+        this.task.emergency_id=value.id
+        let postList = [value.id]
+        postAction(apiUrl, postList).then((res)=>{
+          if (res.success){
+            this.emergency=res.result
+          }
+        })
+      },
+      //创建任务
+      writeTask(){
+        let apiUrl = emergencyCompile.writeTask
+        let post = this.task
+        postAction(apiUrl,post).then((res)=>{
+          if (res.success){
+            this.$message.success('任务创建成功!')
+            this.taskCreateModal=false
+          }
+        })
+      },
+      // ok button
+      onSubmit() {
+        this.$refs.taskForm.validate(valid => {
+          if (valid) {
+            this.writeTask()
+          } else {
+            this.$message.error('任务创建失败，服务器原因!')
+            return false;
+          }
+        });
       },
       onTaskCancel() {
         this.taskCreateModal=false
       },
+      clearData(){
+        this.task={
+          name: '',
+          emergency_type: [],
+          emergency_id:'',
+        }
+        this.emergencySelectList=''
+        this.emergency = {}
+      }
     },
   };
 </script>

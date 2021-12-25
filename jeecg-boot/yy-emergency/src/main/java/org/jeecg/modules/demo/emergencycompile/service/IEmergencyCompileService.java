@@ -15,4 +15,9 @@ public interface IEmergencyCompileService {
 
     List<Map<String, Object>> getEmergencyList();
 
+    List<Map<String, Object>> getEmergenciesByType(List<String> postList);
+
+    Object getEmergencyById(List<String> postList);
+
+    int writeTask(LinkedHashMap<String,Object> postList);
 }

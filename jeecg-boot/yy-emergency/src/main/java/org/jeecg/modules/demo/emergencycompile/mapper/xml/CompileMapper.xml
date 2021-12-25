@@ -28,4 +28,16 @@
         SELECT CONCAT(t.name,t.statue) FROM affair.emergency_task as e , affair.task as t
         WHERE e.emergency_id='${id}' AND e.task_id=t.id;
     </select>
+
+    <select id="getEmergenciesByType" parameterType="java.lang.String" resultType="java.util.HashMap">
+        SELECT e.id,e.name FROM affair.emergency AS e
+        WHERE e.emergency_type = '${type}';
+    </select>
+
+    <select id="getEmergencyById"
+            parameterType="java.lang.String"
+            resultType="org.jeecg.modules.demo.emergencycompile.entity.Emergency">
+        SELECT e.* FROM affair.emergency AS e
+        WHERE e.id = '${id}';
+    </select>
 </mapper>

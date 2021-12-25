@@ -19,4 +19,8 @@ public interface CompileMapper {
     void writeEmergencyTaskRelation(Relation r);
 
     List<String> getTaskList(@Param("id") int id);
+
+    List<Map<String, Object>> getEmergenciesByType(@Param("type")String type);
+
+    Emergency getEmergencyById(@Param("id")String id);
 }

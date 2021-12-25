@@ -45,4 +45,22 @@ public class EmergencyCompileController {
         List<Map<String, Object>> res = iEmergencyCompileService.getEmergencyList();
         return Result.OK(res);
     }
+
+    @RequestMapping(value = "/taskCreate/getEmergenciesByType", method = RequestMethod.POST)
+    public Result<?> getEmergenciesByType(@RequestBody List<String> postList) {
+        List<Map<String, Object>> res = iEmergencyCompileService.getEmergenciesByType(postList);
+        return Result.OK(res);
+    }
+
+    @RequestMapping(value = "/taskCreate/getEmergencyById", method = RequestMethod.POST)
+    public Result<?> getEmergencyById(@RequestBody List<String> postList) {
+        Object res = iEmergencyCompileService.getEmergencyById(postList);
+        return Result.OK(res);
+    }
+
+    @RequestMapping(value = "/taskCreate/writeTask", method = RequestMethod.POST)
+    public Result<?> writeTask(@RequestBody LinkedHashMap<String,Object> postList) {
+        int last_id = iEmergencyCompileService.writeTask(postList);
+        return Result.OK(last_id);
+    }
 }
