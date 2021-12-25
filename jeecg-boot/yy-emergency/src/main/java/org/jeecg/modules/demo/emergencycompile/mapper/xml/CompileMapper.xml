@@ -11,7 +11,7 @@
     <insert id="writeTask" parameterType="org.jeecg.modules.demo.emergencycompile.entity.Task"
             keyProperty="id" useGeneratedKeys="true">
         INSERT INTO affair.task()
-        VALUES (#{id},#{name},#{statue})
+        VALUES (#{id},#{name},#{statue},#{delete_flag})
     </insert>
 
     <insert id="writeEmergencyTaskRelation" parameterType="org.jeecg.modules.demo.emergencycompile.entity.Relation"
@@ -26,7 +26,7 @@
 
     <select id="getTaskList" parameterType="java.lang.String" resultType="java.lang.String">
         SELECT CONCAT(t.name,t.statue) FROM affair.emergency_task as e , affair.task as t
-        WHERE e.emergency_id='${id}' AND e.task_id=t.id;
+        WHERE e.emergency_id='${id}' AND e.task_id=t.id AND t.delete_flag = 0;
     </select>
 
     <select id="getEmergenciesByType" parameterType="java.lang.String" resultType="java.util.HashMap">
@@ -40,4 +40,13 @@
         SELECT e.* FROM affair.emergency AS e
         WHERE e.id = '${id}';
     </select>
+
+    <select id="getTasksList" parameterType="java.lang.String" resultType="java.util.HashMap">
+        SELECT t.* FROM affair.emergency_task as e , affair.task as t
+        WHERE e.emergency_id='${id}' AND e.task_id=t.id AND t.delete_flag = 0;
+    </select>
+
+    <update id="taskDeleteById">
+        UPDATE affair.task SET delete_flag = 1 WHERE id = '${id}';
+    </update>
 </mapper>

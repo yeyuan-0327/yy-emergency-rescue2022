@@ -91,8 +91,22 @@ public class EmergencyServiceImpl implements IEmergencyCompileService {
         return taskAndRelationWrite(name,eId);
     }
 
+    @Override
+    public List<Map<String, Object>> getTaskByEmergencyId(List<String> postList) {
+        int eId = Integer.parseInt(postList.get(0));
+        List<Map<String, Object>> taskIdList = compileMapper.getTasksList(eId);
+        return taskIdList;
+    }
+
+    @Override
+    public boolean taskDeleteById(List<String> postList) {
+        int len = 0;
+        for(String id : postList) len += compileMapper.taskDeleteById(id);
+        return len == postList.size();
+    }
+
     private int taskAndRelationWrite(String name,Integer emergencyId){
-        Task t = new Task(name,0);
+        Task t = new Task(name);
         compileMapper.writeTask(t);
         Relation r = new Relation(emergencyId,t.getId());
         compileMapper.writeEmergencyTaskRelation(r);

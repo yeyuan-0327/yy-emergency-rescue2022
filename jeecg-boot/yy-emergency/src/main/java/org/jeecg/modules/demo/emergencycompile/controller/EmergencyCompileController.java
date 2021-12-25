@@ -2,6 +2,7 @@ package org.jeecg.modules.demo.emergencycompile.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.modules.demo.emergencycompile.entity.Task;
 import org.jeecg.modules.demo.emergencycompile.service.IEmergencyCompileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -62,5 +63,17 @@ public class EmergencyCompileController {
     public Result<?> writeTask(@RequestBody LinkedHashMap<String,Object> postList) {
         int last_id = iEmergencyCompileService.writeTask(postList);
         return Result.OK(last_id);
+    }
+
+    @RequestMapping(value = "/emergencyStatue/getTaskByEmergencyId", method = RequestMethod.POST)
+    public Result<?> getTaskByEmergencyId(@RequestBody List<String> postList) {
+        List<Map<String, Object>> res = iEmergencyCompileService.getTaskByEmergencyId(postList);
+        return Result.OK(res);
+    }
+
+    @RequestMapping(value = "/emergencyStatue/taskDeleteById", method = RequestMethod.POST)
+    public Result<?> taskDeleteById(@RequestBody List<String> postList) {
+        boolean res = iEmergencyCompileService.taskDeleteById(postList);
+        return Result.OK(res);
     }
 }

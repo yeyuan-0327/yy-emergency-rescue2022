@@ -4,6 +4,7 @@ public class Task {
     private Integer id;
     private String name;
     private int statue;
+    private int delete_flag;
 
     public Task() {
     }
@@ -14,18 +15,8 @@ public class Task {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", statue=" + statue +
+                ", delete_flag=" + delete_flag +
                 '}';
-    }
-
-    public Task(String name, int statue) {
-        this.name = name;
-        this.statue = statue;
-    }
-
-    public Task(Integer id, String name, int statue) {
-        this.id = id;
-        this.name = name;
-        this.statue = statue;
     }
 
     public Integer getId() {
@@ -51,4 +42,24 @@ public class Task {
     public void setStatue(int statue) {
         this.statue = statue;
     }
+
+    public int getDelete_flag() {
+        return delete_flag;
+    }
+
+    public void setDelete_flag(int delete_flag) {
+        this.delete_flag = delete_flag;
+    }
+
+    public Task(Integer id, String name, int statue, int delete_flag) {
+        this.id = id;
+        this.name = name;
+        this.statue = statue;
+        this.delete_flag = delete_flag;
+    }
+
+    public Task(String name) {
+        this.name = name;
+    }
+
 }

@@ -26,74 +26,84 @@
     <!-- 查询区域-END -->
     <a-row>
         <a-col :span="10" >
-          <a-table :columns="columns"
-                   :data-source="data"
+          <a-table :columns="emergencyColumns"
+                   :data-source="emergencyData"
+                   rowKey="id"
                    :pagination="false"
-                   :scroll="{ y:500 }"
+                   :scroll="{y:500 }"
           >
-            <a slot="name" slot-scope="text" @click="nameClick(text)">{{ text }}</a>
-            <span slot="customTitle"><a-icon type="smile-o" /> Name</span>
-            <span slot="tags" slot-scope="tags">
-          <a-tag
-            v-for="tag in tags"
-            :key="tag"
-            :color="tag === 'loser' ? 'volcano' : tag.length > 5 ? 'geekblue' : 'green'"
-          >
-            {{ tag.toUpperCase() }}
-          </a-tag>
-          </span>
+            <a slot="emergencyName" slot-scope="text, data" @click="emNameClick(text,data)">{{ text }}</a>
+            <span slot="customTitle"><a-icon type="alert" />险情名称</span>
           </a-table>
         </a-col>
         <a-col :span="14">
           <div style="margin-left: 20px">
             <div>
-              <a-table :columns="columns"
-                       :data-source="data"
+              <div class="ant-alert ant-alert-info" style="margin-bottom: 5px;">
+                <i class="anticon anticon-info-circle ant-alert-icon"></i> 已选择 <a style="font-weight: 600">{{ selectedTaskRowKeys.length }}</a>项
+                <template v-if="selectedTaskRowKeys.length > 0">
+                  <a-divider type="vertical"/>
+                  <a @click="onClearSelected">清空</a>
+                  <a
+                    style="margin-left: 15px"
+                    @click="taskBatchDel"> 批量删除</a>
+                </template>
+              </div>
+              <a-table :columns="taskColumns"
+                       :data-source="taskData"
                        :pagination="false"
+                       rowKey="id"
                        :scroll="{ y:200 }"
+                       :rowSelection="{selectedRowKeys: selectedTaskRowKeys, onChange: onSelectChange}"
               >
-                <a slot="name" slot-scope="text" @click="nameClick(text)">{{ text }}</a>
-                <span slot="customTitle"><a-icon type="smile-o" /> Name</span>
-                <span slot="tags" slot-scope="tags">
-          <a-tag
-            v-for="tag in tags"
-            :key="tag"
-            :color="tag === 'loser' ? 'volcano' : tag.length > 5 ? 'geekblue' : 'green'"
-          >
-            {{ tag.toUpperCase() }}
-          </a-tag>
-          </span>
+                <span slot="name" slot-scope="text">{{ text+'任务' }}</span>
+                <span slot="statue" slot-scope="tag">
+                  <a-tag
+                    :key="tag"
+                    :color="tag === 0 ? 'volcano' : 'green'">
+                    <a-popover >
+                        {{ tag===0 ? '未完成': '已完成' }}
+                    </a-popover>
+                  </a-tag>
+                </span>
+                <span slot="action" slot-scope="text, record">
+                  <a @click="clickTaskToShowDetail(record)">详情</a>
+                  <a-divider type="vertical" />
+                  <a-popconfirm title="确定删除吗?" @confirm="() => handleTaskDelete(record.id)">
+                    <a>删除</a>
+                  </a-popconfirm>
+                </span>
               </a-table>
             </div>
             <br>
             <div>
               <a-descriptions bordered>
                 <a-descriptions-item label="Product">
-                  Cloud Database
+                  {{clickTaskName}}
                 </a-descriptions-item>
                 <a-descriptions-item label="Billing Mode">
-                  Prepaid
+                  {{clickTaskName}}
                 </a-descriptions-item>
                 <a-descriptions-item label="Automatic Renewal">
-                  YES
+                  {{clickTaskName}}
                 </a-descriptions-item>
-                <a-descriptions-item label="Order time">
-                  2018-04-24 18:00:00
+                <a-descriptions-item label="Order time" >
+                  {{clickTaskName}}
                 </a-descriptions-item>
                 <a-descriptions-item label="Usage Time" :span="2">
-                  2019-04-24 18:00:00
+                  {{clickTaskName}}
                 </a-descriptions-item>
                 <a-descriptions-item label="Status" :span="3">
-                  <a-badge status="processing" text="Running" />
+                  <a-badge status="processing" :text="clickTaskName" />
                 </a-descriptions-item>
                 <a-descriptions-item label="Negotiated Amount">
-                  $80.00
+                  {{clickTaskName}}
                 </a-descriptions-item>
                 <a-descriptions-item label="Discount">
-                  $20.00
+                  {{clickTaskName}}
                 </a-descriptions-item>
                 <a-descriptions-item label="Official Receipts">
-                  $60.00
+                  {{clickTaskName}}
                 </a-descriptions-item>
               </a-descriptions>
             </div>
@@ -104,169 +114,103 @@
 </template>
 
 <script>
-  const columns = [
-    {
-      dataIndex: 'name',
-      key: 'name',
-      slots: { title: 'customTitle' },
-      // name handleClick
-      scopedSlots: { customRender: 'name' },
-    },
-    {
-      title: 'Age',
-      dataIndex: 'age',
-      key: 'age',
-    },
-    {
-      title: 'Address',
-      dataIndex: 'address',
-      key: 'address',
-    },
-    {
-      title: 'Tags',
-      key: 'tags',
-      dataIndex: 'tags',
-      scopedSlots: { customRender: 'tags' },
-    },
-  ];
+  import {getAction, postAction,uploadAction} from "@/api/manage";
+  import { emergencyCompile } from '@/api/EmergencyApi.js'
 
-  const data = [
-    {
-      key: '1',
-      name: 'John Brown',
-      age: 32,
-      address: 'New York No. 1 Lake Park',
-      tags: ['nice', 'developer'],
-    },
-    {
-      key: '2',
-      name: 'Jim Green',
-      age: 42,
-      address: 'London No. 1 Lake Park',
-      tags: ['loser'],
-    },
-    {
-      key: '3',
-      name: 'Joe Black',
-      age: 32,
-      address: 'Sidney No. 1 Lake Park',
-      tags: ['cool', 'teacher'],
-    },
-    {
-      key: '4',
-      name: 'John Brown',
-      age: 32,
-      address: 'New York No. 1 Lake Park',
-      tags: ['nice', 'developer'],
-    },
-    {
-      key: '5',
-      name: 'Jim Green',
-      age: 42,
-      address: 'London No. 1 Lake Park',
-      tags: ['loser'],
-    },
-    {
-      key: '6',
-      name: 'Joe Black',
-      age: 32,
-      address: 'Sidney No. 1 Lake Park',
-      tags: ['cool', 'teacher'],
-    },
-    {
-      key: '7',
-      name: 'John Brown',
-      age: 32,
-      address: 'New York No. 1 Lake Park',
-      tags: ['nice', 'developer'],
-    },
-    {
-      key: '8',
-      name: 'Jim Green',
-      age: 42,
-      address: 'London No. 1 Lake Park',
-      tags: ['loser'],
-    },
-    {
-      key: '9',
-      name: 'Joe Black',
-      age: 32,
-      address: 'Sidney No. 1 Lake Park',
-      tags: ['cool', 'teacher'],
-    },
-    {
-      key: '2',
-      name: 'Jim Green',
-      age: 42,
-      address: 'London No. 1 Lake Park',
-      tags: ['loser'],
-    },
-    {
-      key: '3',
-      name: 'Joe Black',
-      age: 32,
-      address: 'Sidney No. 1 Lake Park',
-      tags: ['cool', 'teacher'],
-    },
-    {
-      key: '4',
-      name: 'John Brown',
-      age: 32,
-      address: 'New York No. 1 Lake Park',
-      tags: ['nice', 'developer'],
-    },
-    {
-      key: '5',
-      name: 'Jim Green',
-      age: 42,
-      address: 'London No. 1 Lake Park',
-      tags: ['loser'],
-    },
-    {
-      key: '6',
-      name: 'Joe Black',
-      age: 32,
-      address: 'Sidney No. 1 Lake Park',
-      tags: ['cool', 'teacher'],
-    },
-    {
-      key: '7',
-      name: 'John Brown',
-      age: 32,
-      address: 'New York No. 1 Lake Park',
-      tags: ['nice', 'developer'],
-    },
-    {
-      key: '8',
-      name: 'Jim Green',
-      age: 42,
-      address: 'London No. 1 Lake Park',
-      tags: ['loser'],
-    },
-    {
-      key: '9',
-      name: 'Joe Black',
-      age: 32,
-      address: 'Sidney No. 1 Lake Park',
-      tags: ['cool', 'teacher'],
-    },
-
-  ];
   export default {
     name: 'EmergencyList',
     data() {
       return {
-        data,
-        columns,
+        //emergency
+        emergencyColumns:[
+          {
+            dataIndex: 'name',
+            key: 'name',
+            slots: { title: 'customTitle' },
+            // name handleClick
+            scopedSlots: { customRender: 'emergencyName' },
+          },
+          {
+            title: '险情等级',
+            dataIndex: 'emergency_level',
+            width:90,
+            align:"center",
+            key: 'emergency_level',
+          },
+          {
+            title: '险情类型',
+            dataIndex: 'emergency_type',
+            width:90,
+            key: 'emergency_type',
+          },
+          {
+            title: '发布时间',
+            dataIndex: 'time',
+            key: 'time',
+          },
+          {
+            title: '险情状态',
+            dataIndex: 'state',
+            key: 'state',
+          },
+        ],
+        emergencyData:[],
+        clickEmergencyId:'',
+        //task
+        taskColumns:[
+          {
+            title: 'ID',
+            dataIndex: 'id',
+            key: 'id',
+            width:90,
+          },
+          {
+            title: '任务名称',
+            dataIndex: 'name',
+            key: 'name',
+            scopedSlots: { customRender: 'name' },
+          },
+          {
+            title: '任务状态',
+            dataIndex: 'statue',
+            key: 'statue',
+            scopedSlots: { customRender: 'statue' },
+          },
+          {
+            title: '操作',
+            dataIndex: 'action',
+            scopedSlots: { customRender: 'action' }
+          }
+        ],
+        taskData:[],
+        selectedTaskRowKeys:[],
+        clickTaskName:'',
+        //
         searchEmergencyName:'',
         searchTaskName:'',
-
       };
     },
+    created() {
+      this.initEmergencyList();
+    },
     methods: {
-      //table name click
-      nameClick(name){
-        console.log(name)
+      //emergency name click
+      emNameClick(name,data){
+        this.getTaskByEmId(data.id)
+      },
+      // get task by emId
+      getTaskByEmId(id){
+        // 记录下来 点击过的险情id，方便删除任务后重加载任务
+        this.clickEmergencyId = id
+        let apiUrl = emergencyCompile.getTaskByEmergencyId
+        let postList = [id]
+        postAction(apiUrl, postList).then((res)=>{
+          if (res.success){
+            this.taskData = res.result
+            // 点击过的任务名称
+            this.clickTaskName=res.result[0].name
+          }
+        })
       },
       //search button
       searchAllQuery(){
@@ -274,6 +218,44 @@
       },
       searchAllReset(){
 
+      },
+      // 选择
+      onSelectChange(selectedRowKeys){
+        this.selectedTaskRowKeys = selectedRowKeys
+      },
+      // clear 选项
+      onClearSelected(){
+        this.selectedTaskRowKeys=[]
+      },
+      // batch Del
+      taskBatchDel(){
+
+      },
+      // del one task
+      handleTaskDelete(id){
+        let apiUrl = emergencyCompile.taskDeleteById
+        let postList = [id]
+        postAction(apiUrl,postList).then((res)=>{
+          if (res.success){
+            this.getTaskByEmId(this.clickEmergencyId)
+          }
+        })
+      },
+      // show task detail
+      clickTaskToShowDetail(record){
+        this.clickTaskName = record.name
+      },
+      // get emergency
+      initEmergencyList(){
+        let apiUrl = emergencyCompile.emergencyList
+        getAction(apiUrl).then((res)=>{
+          if (res.success){
+            this.emergencyData = res.result
+            if (res.result !== '') {
+              this.getTaskByEmId(res.result[0].id)
+            }
+          }
+        })
       },
     },
   }

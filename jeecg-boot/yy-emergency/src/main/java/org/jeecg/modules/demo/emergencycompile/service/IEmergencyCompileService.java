@@ -1,5 +1,6 @@
 package org.jeecg.modules.demo.emergencycompile.service;
 
+import org.jeecg.modules.demo.emergencycompile.entity.Task;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.LinkedHashMap;
@@ -20,4 +21,8 @@ public interface IEmergencyCompileService {
     Object getEmergencyById(List<String> postList);
 
     int writeTask(LinkedHashMap<String,Object> postList);
+
+    List<Map<String, Object>> getTaskByEmergencyId(List<String> postList);
+
+    boolean taskDeleteById(List<String> postList);
 }

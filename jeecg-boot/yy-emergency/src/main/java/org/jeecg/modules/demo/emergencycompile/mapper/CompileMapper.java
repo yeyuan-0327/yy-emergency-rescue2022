@@ -23,4 +23,9 @@ public interface CompileMapper {
     List<Map<String, Object>> getEmergenciesByType(@Param("type")String type);
 
     Emergency getEmergencyById(@Param("id")String id);
+
+
+    List<Map<String, Object>> getTasksList(int eId);
+
+    int taskDeleteById(@Param("id")String id);
 }

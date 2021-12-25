@@ -34,4 +34,6 @@ export const emergencyCompile={
   getEmergencyByType:'/emergencyCompile/taskCreate/getEmergenciesByType',
   getEmergencyById:'/emergencyCompile/taskCreate/getEmergencyById',
   writeTask:'/emergencyCompile/taskCreate/writeTask',
+  getTaskByEmergencyId:'/emergencyCompile/emergencyStatue/getTaskByEmergencyId',
+  taskDeleteById:'/emergencyCompile/emergencyStatue/taskDeleteById'
 }
