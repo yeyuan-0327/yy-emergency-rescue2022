@@ -133,7 +133,7 @@
             @change="handleUploadExcel"
             :showUploadList="{showRemoveIcon: true,showDownloadIcon: true}"
           >
-            <a-button> <a-icon type="upload" /> Upload </a-button>
+            <a-button> <a-icon type="upload" /> 文件上传 </a-button>
           </a-upload>
         </a-form-model-item>
 

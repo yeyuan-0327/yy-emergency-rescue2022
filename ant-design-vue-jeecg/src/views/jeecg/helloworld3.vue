@@ -1,7 +1,9 @@
 <template>
-  <div>
-    {{ msg }}
-  </div>
+    <a-card >
+      <div class="photo">
+        <img class="an img" src="@/assets/firstPage.jpg" >
+      </div>
+    </a-card>
 </template>
 
 <script>
@@ -9,21 +11,18 @@
   export default {
     data () {
       return {
-        msg: ""
       }
     },
     methods: {
-      hello () {
-        var url = "/test/jeecgDemo/hello"
-        getAction(url).then((res) => {
-          if (res.success) {
-            this.msg = res.result;
-          }
-        })
-      }
     },
     created() {
-      this.hello();
     }
   }
 </script>
+
+<style scoped>
+  .photo{
+    text-align: center;
+  }
+  .img{border-radius: 300px;}
+</style>

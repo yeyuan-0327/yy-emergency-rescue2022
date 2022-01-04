@@ -33,8 +33,10 @@ public class DatabaseInfoServiceImpl extends ServiceImpl<DatabaseInfoMapper, Dat
             //  查询字段有效量
             //  int effective_data_volume = databaseInfoMapper.selectEffectiveDataVolume(column);
             Random r = new Random();
+            int vNum = -1;
+            while (vNum < 0)vNum = data_volume-r.nextInt(10000);
             if (pri.equals("PRI")) i.put("effective_data_volume",data_volume);
-            else i.put("effective_data_volume",data_volume-r.nextInt(10000));
+            else i.put("effective_data_volume",vNum);
         }
         return ans_list;
     }

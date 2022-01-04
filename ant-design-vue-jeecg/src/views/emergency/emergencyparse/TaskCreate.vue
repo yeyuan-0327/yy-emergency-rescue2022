@@ -66,11 +66,11 @@
           </a-checkbox-group>
         </a-form-model-item>
         <a-form-model-item label="险情名称" prop="emergency_id">
-          <a-select v-model="task.emergency" @select="emergencyIdSelect">
+          <a-select v-model="task.emergency_id" @select="emergencyIdSelect">
             <a-select-option
               v-for="e in emergencySelectList"
               :key = "e.id"
-              :value="e">
+              :value="e.id">
               {{e.name}}
             </a-select-option>
           </a-select>
@@ -159,7 +159,6 @@
         task: {
           name: '',
           emergency_type: [],
-          emergency:'',
           emergency_id:'',
         },
         rules: {
@@ -167,7 +166,7 @@
             { required: true, message: '请输入任务名称', trigger: 'blur' },
             { min: 4, max: 20, message: '长度应该为4到20', trigger: 'blur' },
           ],
-          emergency: [{ required: true, message: '请选择所属险情', trigger: 'change' }],
+          emergency_id: [{ required: true, message: '请选择所属险情', trigger: 'change' }],
           emergency_type: [
             {
               type: 'array',
@@ -214,8 +213,7 @@
       //
       emergencyIdSelect(value){
         let apiUrl = emergencyCompile.getEmergencyById
-        this.task.emergency_id=value.id
-        let postList = [value.id]
+        let postList = [value]
         postAction(apiUrl, postList).then((res)=>{
           if (res.success){
             this.emergency=res.result
