@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.demo.dispatchmanage.mapper.DispatchMapper">
+    <select id="getEmergencies" parameterType="java.lang.String" resultType="java.util.HashMap">
+        SELECT * FROM affair.emergency WHERE state='提交';
+    </select>
+
+    <select id="getTasks" parameterType="java.lang.String" resultType="java.util.HashMap">
+        SELECT t.id,t.name FROM affair.emergency_task as e , affair.task as t
+        WHERE e.emergency_id='${id}' AND e.task_id=t.id AND t.delete_flag = 0
+        AND statue = 0;
+    </select>
+
+    <select id="existsLocation" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT 1 FROM affair.emergency_task as e WHERE e.emergency_id='${id}' LIMIT 1;
+    </select>
+</mapper>

@@ -34,6 +34,12 @@ export const emergencyCompile={
   getEmergencyByType:'/emergencyCompile/taskCreate/getEmergenciesByType',
   getEmergencyById:'/emergencyCompile/taskCreate/getEmergencyById',
   writeTask:'/emergencyCompile/taskCreate/writeTask',
-  getTaskByEmergencyId:'/emergencyCompile/emergencyStatue/getTaskByEmergencyId',
+  getTaskByEmergencyId:'/emergencyCompile/emergencyStatue/getTasksByEmergencyId',
   taskDeleteById:'/emergencyCompile/emergencyStatue/taskDeleteById'
+}
+
+export const dispatchManage={
+  // location
+  getEmergencies: '/dispatchManage/locationSelect/getEmergencies',
+  getTaskAddsByEmergencyId:'/dispatchManage/locationSelect/getTaskAddsByEmergencyId',
 }
