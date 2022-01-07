@@ -12,6 +12,40 @@
     </select>
 
     <select id="existsLocation" parameterType="java.lang.String" resultType="java.lang.String">
-        SELECT 1 FROM affair.emergency_task as e WHERE e.emergency_id='${id}' LIMIT 1;
+        SELECT 1 FROM affair.location as a
+        WHERE a.task_id='${id}' LIMIT 1;
     </select>
+
+    <select id="getEmergencyAddress" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT address FROM affair.emergency WHERE id='${id}' LIMIT 1;
+    </select>
+
+    <insert id="insertDefaultLocationTask" parameterType="java.lang.String">
+        INSERT INTO affair.location(task_id,address)
+        VALUE (#{tId},#{address});
+    </insert>
+
+    <select id="getTaskLocationById" parameterType="java.lang.String" resultType="java.util.HashMap">
+        SELECT  l.id,l.task_id,
+                l.address as taskAddress,
+                l.lnglat,l.explain,
+                t.`name`,
+                em.address
+        FROM
+        affair.emergency as em,
+        affair.emergency_task as e ,
+        affair.task as t,
+        affair.location as l
+        WHERE
+        em.id =  '${id}' AND
+        e.emergency_id = '${id}'
+        AND e.task_id = t.id
+        AND t.id = l.task_id;
+    </select>
+
+    <update id="updateTaskAddress" >
+        UPDATE affair.location as l
+        SET l.address=#{address},l.lnglat = #{lngLat},l.explain=#{explain}
+        WHERE l.task_id = #{tId}
+    </update>
 </mapper>

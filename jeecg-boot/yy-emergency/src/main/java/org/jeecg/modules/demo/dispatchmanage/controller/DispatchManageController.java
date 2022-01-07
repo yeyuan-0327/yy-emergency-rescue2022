@@ -6,6 +6,7 @@ import org.jeecg.modules.demo.dispatchmanage.service.IDispatchManageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.PublicKey;
 import java.util.*;
 
 @RequestMapping("/dispatchManage")
@@ -25,5 +26,15 @@ public class DispatchManageController {
     public Result<?> getTaskAddsByEmergencyId(@RequestBody List<String> postList) {
         List<Map<String, Object>> res = iDispatchManageService.getTaskAddsByEmergencyId(postList);
         return Result.OK(res);
+    }
+
+    @RequestMapping(value = "/locationSelect/updateTaskAddress", method = RequestMethod.POST)
+    public Result<?> updateTaskAddress(@RequestBody List<String> postList){
+        int returnNum = iDispatchManageService.updateTaskAddress(postList);
+        if (returnNum==1){
+            return Result.OK("插入成功");
+        }else{
+            return Result.error("服务器原因，插入失败");
+        }
     }
 }

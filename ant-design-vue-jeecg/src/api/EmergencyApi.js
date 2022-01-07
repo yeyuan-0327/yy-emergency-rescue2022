@@ -42,4 +42,5 @@ export const dispatchManage={
   // location
   getEmergencies: '/dispatchManage/locationSelect/getEmergencies',
   getTaskAddsByEmergencyId:'/dispatchManage/locationSelect/getTaskAddsByEmergencyId',
+  updateTaskAddress:'/dispatchManage/locationSelect/updateTaskAddress',
 }

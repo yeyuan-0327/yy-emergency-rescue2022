@@ -6,15 +6,18 @@
         <a-collapse v-model="activeKey" expand-icon-position="right" @change="paddleChange" accordion>
           <a-collapse-panel v-for="item in paddleData" :key="String(item.id)" :header="item.name" >
             <div>
-              <a-table :columns="columns"
+              <a-table
+                       :columns="columns"
                        :data-source="item.taskData"
+                       :loading="tableLoading"
                        :pagination="false"
+                       rowKey="task_id"
                        style="margin-left: -8px"
                        size="middle" >
               <span slot="action" slot-scope="text, record">
                   <a @click="handleTaskEdit(record)">更改</a>
                   <a-divider type="vertical" />
-                  <a @click="handleTaskAddressShow(record)">查看</a>
+                  <a @click="handleTaskAddressShow(record)" :disabled="clickMapPoint">查看</a>
               </span>
               </a-table>
             </div>
@@ -49,6 +52,12 @@
                 <a-input :value="address" type="text" style="width: 300px" disabled></a-input>
                 <a-button type="primary" @click="lngLatConfirm" :disabled="!clickMapPoint">确认</a-button>
               </a-space>
+              <div style="margin-top: 10px">
+              <a-space :size="6">
+              <span class="input-item-text" >地点说明</span>
+              <a-input v-model = "explain" type="text"  style="width: 400px" :disabled="lngLat===''"></a-input>
+              </a-space>
+              </div>
             </div>
           </div>
         </a-spin>
@@ -68,15 +77,20 @@
 
   const columns = [
     {
-      title: '任务名称',
-      dataIndex: 'name',
+      title: '任务序号',
+      width:80,
+      dataIndex: 'task_id',
+    },
+    {
+      title:'任务名称',
+      dataIndex:'name'
     },
     {
       title: '险情地址',
       dataIndex: 'address',
     },
     {
-      title: '任务地址(默认)',
+      title: '任务地址',
       dataIndex: 'taskAddress',
     },
     {
@@ -87,27 +101,25 @@
   ];
   const data = [
     {
-      key: '0',
+      task_id: '0',
       name: '社会动员',
-      taskAddress: '经开区丰报云村',
       address: '经开区丰报云村',
       lngLat:'',
     },
     {
-      key: '1',
+      task_id: '1',
       name: '治安维护',
-      taskAddress: '经开区丰报云村',
       address: '经开区丰报云村',
       lngLat:'',
     },
     {
-      key: '2',
+      task_id: '2',
       name: '医疗救护',
-      taskAddress: '经开区丰报云村',
       address: '经开区丰报云村',
       lngLat:'',
     },
   ];
+
   export default {
     name: 'LocationSelect',
     data(){
@@ -115,9 +127,11 @@
         activeKey: [],
         address:'',
         lngLat:'',
+        explain:'',
         // 折叠面板数据
         paddleData:[],
         columns,
+        tableLoading:true,
         // map load
         mapSpinning:true,
         // 允许地图点击
@@ -171,17 +185,18 @@
       },
       //加载
       getTaskAddsByEmergencyId(eId){
+        this.tableLoading = true
         let apiUrl = dispatchManage.getTaskAddsByEmergencyId
         let postList = [eId]
         postAction(apiUrl,postList).then((res)=>{
           if (res.success){
-            console.log(res.result)
+            this.paddleData[--eId]['taskData']=res.result
+            this.tableLoading=false
           }
         })
       },
       // 折叠板点击
       paddleChange(eId){
-        console.log(eId)
         if (eId!==undefined) this.getTaskAddsByEmergencyId(eId)
       },
       // 折叠板设置icon
@@ -192,7 +207,7 @@
       //任务地址更改 button
       handleTaskEdit(record){
         this.clickMapPoint=!this.clickMapPoint
-        this.clickTaskChangeId=record.key
+        this.clickTaskChangeId = record.task_id
       },
       //险情地址更改按钮
       emergencyAddressChange(item){
@@ -204,9 +219,7 @@
       },
       // 地点确认按钮
       lngLatConfirm(){
-        data[this.clickTaskChangeId].taskAddress=this.address
-        data[this.clickTaskChangeId].lngLat=this.lngLat
-        this.$message.success('任务地点更改成功!')
+        this.updateTaskAddress(this.clickTaskChangeId,this.address,this.lngLat,this.explain);
         this.clickMapPoint=!this.clickMapPoint
       },
       // 初始化地图
@@ -242,7 +255,7 @@
         let that = this
         // 如果没有经纬度 根据地址来查询 且定位
         let lngLat
-        if (task.lngLat === ''){
+        if (task['lnglat'] === null){
           AMap.plugin('AMap.Geocoder', function() {
             const geocoder = new AMap.Geocoder({
               // city 指定进行编码查询的城市，支持传入城市名、adcode 和 citycode
@@ -257,7 +270,7 @@
             })
           })
         }else{
-          lngLat = [task.lngLat.split(',')[0],task.lngLat.split(',')[1]]
+          lngLat = [task['lnglat'].split(',')[0],task['lnglat'].split(',')[1]]
           setMakerAndMove(lngLat)
         }
         function setMakerAndMove(lngLat) {
@@ -266,7 +279,21 @@
           that.map.setZoomAndCenter(15,lngLat)
           that.lngLat = String(lngLat)
           that.address=task.taskAddress
+          that.explain=task.explain;
         }
+      },
+      // 修改任务地址
+      updateTaskAddress(tId, address, lngLat, explain) {
+        let apiUrl = dispatchManage.updateTaskAddress
+        let postList = [tId,address,lngLat,explain]
+        postAction(apiUrl,postList).then((res)=>{
+          if (res.success){
+            this.$message.success('任务地点更改成功!')
+            this.getTaskAddsByEmergencyId(this.activeKey[0])
+          }else{
+            this.$message.error(res.result)
+          }
+        })
       }
     }
   }

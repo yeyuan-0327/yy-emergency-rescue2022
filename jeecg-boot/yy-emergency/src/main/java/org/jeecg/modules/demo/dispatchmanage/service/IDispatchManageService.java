@@ -7,4 +7,6 @@ public interface IDispatchManageService {
     List<Map<String, Object>> getEmergencies();
 
     List<Map<String, Object>> getTaskAddsByEmergencyId(List<String> postList);
+
+    int updateTaskAddress(List<String> postList);
 }
