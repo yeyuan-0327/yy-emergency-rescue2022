@@ -39,7 +39,7 @@
   import Vue from 'vue'
   import { CACHE_INCLUDED_ROUTES } from '@/store/mutation-types'
 
-  const indexKey = '/dashboard/analysis'
+  const indexKey = '/emergency/firstPage'
 
   export default {
     name: 'TabLayout',
