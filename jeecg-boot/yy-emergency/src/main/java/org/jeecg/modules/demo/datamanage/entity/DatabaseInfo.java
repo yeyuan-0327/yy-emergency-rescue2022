@@ -24,7 +24,7 @@ import lombok.experimental.Accessors;
  * @Version: V1.0
  */
 @Data
-@TableName("database_info")
+@TableName("affair.database")
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
 @ApiModel(value="database_info对象", description="基础数据库信息表")

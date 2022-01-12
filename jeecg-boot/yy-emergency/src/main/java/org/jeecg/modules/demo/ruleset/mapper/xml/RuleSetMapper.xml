@@ -3,15 +3,15 @@
 <mapper namespace="org.jeecg.modules.demo.ruleset.mapper.RuleSetMapper">
     <insert id="ruleUploadDB" parameterType="org.jeecg.modules.demo.ruleset.entity.Rule"
             keyProperty="id" useGeneratedKeys="true">
-    INSERT INTO rule_table()
+    INSERT INTO affair.rule()
     VALUES (#{id},#{name},#{type},#{path}, #{meta}, #{task_type}, #{invalid_date}, #{update},#{delete_flag})
     </insert>
 
     <select id="getRuleList" parameterType="java.lang.String" resultType="java.util.HashMap">
-        SELECT * FROM rule_table WHERE delete_flag = 0;
+        SELECT * FROM affair.rule() WHERE delete_flag = 0;
     </select>
 
     <update id="deleteRule">
-        UPDATE rule_table SET delete_flag = 1 WHERE id = '${id}';
+        UPDATE affair.rule() SET delete_flag = 1 WHERE id = '${id}';
     </update>
 </mapper>

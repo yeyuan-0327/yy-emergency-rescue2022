@@ -41,7 +41,7 @@
         substring(field_des,(LENGTH(field_des)/4)+1),
         ';<![CDATA[<br/>]]>数据量:',volume,';<![CDATA[<br/>]]>表大小:',size,
         ';<![CDATA[<br/>]]>最后更新时间',last_update_time) as des
-        FROM fact_table;
+        FROM affair.fact;
     </select>
 
     <select id="fetchDimFactRelationPointDim" parameterType="java.lang.String" resultType="java.util.HashMap">
@@ -55,13 +55,13 @@
         ';<![CDATA[<br/>]]>数据量:',volume,
         ';<![CDATA[<br/>]]>表大小:',size,
         ';<![CDATA[<br/>]]>最后更新时间',last_update_time) as des
-        FROM dim_table;
+        FROM affair.dim;
     </select>
 
     <select id="fetchDimFactRelationLink" parameterType="java.lang.String" resultType="java.util.HashMap">
         SELECT d.chinese_name as 'source','relation' as 'type',
         f.chinese_name as 'target'
-        FROM dim_table as d,fact_table as f
+        FROM affair.dim as d,affair.fact as f
         WHERE d.reletion_fact=f.name;
     </select>
 
