@@ -1,16 +1,17 @@
 <template>
+  <div>
     <a-card >
       <a-row>
         <a-col :span="6">
-            <a-cascader
-              size="large"
-              :options="options"
-              :load-data="loadSelectData"
-              placeholder="Please select"
-              change-on-select
-              style="width: 300px;margin-left: 20px"
-              @change="onSelectChange"
-            />
+          <a-cascader
+            size="large"
+            :options="options"
+            :load-data="loadSelectData"
+            placeholder="Please select"
+            change-on-select
+            style="width: 300px;margin-left: 20px"
+            @change="onSelectChange"
+          />
           <a-card style="min-height: 500px" :bordered="false">
             <a-list item-layout="horizontal"
                     :data-source="select_emergency_data">
@@ -93,6 +94,7 @@
             </div>
           </a-card>
           <a-card style="min-height: 300px" :bordered="!selectedTaskId">
+<!--            -->
             <div v-show="recommendTaskId">
               <a-descriptions bordered  >
                 <a-descriptions-item label="Product">
@@ -130,6 +132,7 @@
                 <a-button type="primary">应用</a-button>
               </div>
             </div>
+<!--            -->
             <div v-show="!recommendTaskId & !ruleFlag" style="text-align: center;margin-top: 8%" >
               <p>
                 点击上侧详情或更改以加载推荐任务
@@ -138,13 +141,45 @@
                 详情--相似任务内容详情；更改--相似任务参数修改
               </p>
             </div>
-            <div v-show="ruleFlag" style="text-align: center;margin-top: 8%">
-              <p>规则配备的任务内容</p>
+<!--            -->
+            <div v-show="ruleFlag" >
+              <a-form-model :model="taskDetailForm" :label-col="labelCol" :wrapper-col="wrapperCol">
+                <a-form-model-item
+                  v-for="key in Object.keys(taskDetailForm)"
+                  :key="key"
+                  :label="key">
+                  <a-input v-model="taskDetailForm[key]" />
+                </a-form-model-item>
+                <a-form-model-item label="规则列表">
+                  <a-textarea disabled
+                              v-model="JSON.stringify(ruleForm).replace(/null,|[[\\\]]/g,'')"
+                              placeholder="Controlled autosize"
+                              :auto-size="{ minRows: 3, maxRows: 5 }"
+                  ></a-textarea>
+                </a-form-model-item>
+              </a-form-model>
+              <div class="button-action">
+                <a-space>
+                  <a-button @click="clearTaskDetailForm">清空</a-button>
+                  <a-button @click="useTaskDetailForm">应用</a-button>
+                  <a-button type="primary" :loading="publishLoading" @click="publishTaskDetailForm">应用并发布</a-button>
+                </a-space>
+              </div>
             </div>
           </a-card>
         </a-col>
       </a-row>
     </a-card>
+    <a-modal
+      title="Title"
+      :visible="popModalVisible"
+      :confirm-loading="popModalConfirmLoading"
+      @ok="popModalOk"
+      @cancel="popModalCancel"
+    >
+      <p>123456</p>
+    </a-modal>
+  </div>
 </template>
 
 <script>
@@ -342,8 +377,18 @@
         ],
         checkedRule:undefined,
         ruleForm:[],
-        // taskDetailForm
-        taskDetailForm:{}
+        // form modal
+        labelCol: { span: 2 },
+        wrapperCol: { span: 20 },
+        taskDetailForm: {
+          name1: 'abcd',
+          name2: 'abcd',
+          name3: 'abcd',
+        },
+        // pop modal
+        popModalVisible: false,
+        popModalConfirmLoading: false,
+        publishLoading:false,
       };
     },
     methods:{
@@ -393,9 +438,6 @@
         this.clearAllInfo()
         this.selectedTaskId = task_id
         this.ruleFlag=true
-        this.taskDetailForm={
-          task_id:task_id
-        }
       },
       //规则选用
       onRuleClick(checkedValues) {
@@ -405,13 +447,52 @@
       onSingleRuleChange(e) {
         this.ruleForm[this.checkedRule] = e.target.value
       },
+      //应用button
+      useTaskDetailForm(){
+        this.showPopModal()
+      },
+      //应用并发布button
+      publishTaskDetailForm(){
+        this.publishLoading=true
+        setTimeout(() => {
+          this.publishLoading=false
+        }, 1000);
+      },
+      //清空button
+      clearTaskDetailForm(){
+        this.taskDetailForm = {
+            name1: '',
+            name2: '',
+            name3: '',
+        }
+        this.ruleForm = []
+      },
       //clear all
       clearAllInfo(){
         this.selectedTaskId = ''
         this.recommendTaskId = ''
         this.checkedRule = ''
         this.ruleForm = []
-      }
+      },
+      // pop modal
+      showPopModal() {
+        this.popModalVisible = true;
+      },
+      popModalOk(e) {
+        this.popModalConfirmLoading = true;
+        setTimeout(() => {
+          this.popModalVisible = false;
+          this.popModalConfirmLoading = false;
+        }, 1000);
+      },
+      popModalCancel(e) {
+        console.log('Clicked cancel button');
+        this.popModalVisible = false;
+      },
+      // singleRule
+      handleChange(value) {
+        console.log(`selected ${value}`);
+      },
     }
   }
 </script>
