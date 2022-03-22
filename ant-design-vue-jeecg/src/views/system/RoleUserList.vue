@@ -34,10 +34,10 @@
         <div class="table-operator" style="margin: 5px 0 10px 2px">
           <a-button @click="handleAdd" type="primary" icon="plus">新建角色</a-button>
           <!--<a-button @click="handleEdit(model1)" type="primary" icon="plus">角色编辑</a-button>-->
-          <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl" @change="handleImportExcel">
-            <a-button type="primary" icon="import">导入</a-button>
-          </a-upload>
-          <a-button type="primary" icon="download" @click="handleExportXls('角色管理')">导出</a-button>
+<!--          <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl" @change="handleImportExcel">-->
+<!--            <a-button type="primary" icon="import">导入</a-button>-->
+<!--          </a-upload>-->
+<!--          <a-button type="primary" icon="download" @click="handleExportXls('角色管理')">导出</a-button>-->
         </div>
 
         <div class="ant-alert ant-alert-info" style="margin-bottom: 16px;">

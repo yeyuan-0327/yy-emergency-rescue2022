@@ -66,33 +66,33 @@
     <!-- 操作按钮区域 -->
     <div class="table-operator" style="border-top: 5px">
       <a-button @click="handleAdd" type="primary" icon="plus" >添加用户</a-button>
-      <a-button type="primary" icon="download" @click="handleExportXls('用户信息')">导出</a-button>
-      <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl" @change="handleImportExcel">
-        <a-button type="primary" icon="import">导入</a-button>
-      </a-upload>
-      <j-third-app-button biz-type="user" :selected-row-keys="selectedRowKeys" syncToApp syncToLocal @sync-finally="onSyncFinally"/>
-      <a-button type="primary" icon="hdd" @click="recycleBinVisible=true">回收站</a-button>
-      <a-dropdown v-if="selectedRowKeys.length > 0">
-        <a-menu slot="overlay" @click="handleMenuClick">
-          <a-menu-item key="1">
-            <a-icon type="delete" @click="batchDel"/>
-            删除
-          </a-menu-item>
-          <a-menu-item key="2">
-            <a-icon type="lock" @click="batchFrozen('2')"/>
-            冻结
-          </a-menu-item>
-          <a-menu-item key="3">
-            <a-icon type="unlock" @click="batchFrozen('1')"/>
-            解冻
-          </a-menu-item>
-        </a-menu>
-        <a-button style="margin-left: 8px">
-          批量操作
-          <a-icon type="down"/>
-        </a-button>
-      </a-dropdown>
-      <j-super-query :fieldList="superQueryFieldList" @handleSuperQuery="handleSuperQuery"/>
+<!--      <a-button type="primary" icon="download" @click="handleExportXls('用户信息')">导出</a-button>-->
+<!--      <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl" @change="handleImportExcel">-->
+<!--        <a-button type="primary" icon="import">导入</a-button>-->
+<!--      </a-upload>-->
+<!--      <j-third-app-button biz-type="user" :selected-row-keys="selectedRowKeys" syncToApp syncToLocal @sync-finally="onSyncFinally"/>-->
+<!--      <a-button type="primary" icon="hdd" @click="recycleBinVisible=true">回收站</a-button>-->
+<!--      <a-dropdown v-if="selectedRowKeys.length > 0">-->
+<!--        <a-menu slot="overlay" @click="handleMenuClick">-->
+<!--          <a-menu-item key="1">-->
+<!--            <a-icon type="delete" @click="batchDel"/>-->
+<!--            删除-->
+<!--          </a-menu-item>-->
+<!--          <a-menu-item key="2">-->
+<!--            <a-icon type="lock" @click="batchFrozen('2')"/>-->
+<!--            冻结-->
+<!--          </a-menu-item>-->
+<!--          <a-menu-item key="3">-->
+<!--            <a-icon type="unlock" @click="batchFrozen('1')"/>-->
+<!--            解冻-->
+<!--          </a-menu-item>-->
+<!--        </a-menu>-->
+<!--        <a-button style="margin-left: 8px">-->
+<!--          批量操作-->
+<!--          <a-icon type="down"/>-->
+<!--        </a-button>-->
+<!--      </a-dropdown>-->
+<!--      <j-super-query :fieldList="superQueryFieldList" @handleSuperQuery="handleSuperQuery"/>-->
     </div>
 
     <!-- table区域-begin -->
@@ -144,21 +144,21 @@
                 </a-popconfirm>
               </a-menu-item>
 
-              <a-menu-item v-if="record.status==1">
-                <a-popconfirm title="确定冻结吗?" @confirm="() => handleFrozen(record.id,2,record.username)">
-                  <a>冻结</a>
-                </a-popconfirm>
-              </a-menu-item>
+<!--              <a-menu-item v-if="record.status==1">-->
+<!--                <a-popconfirm title="确定冻结吗?" @confirm="() => handleFrozen(record.id,2,record.username)">-->
+<!--                  <a>冻结</a>-->
+<!--                </a-popconfirm>-->
+<!--              </a-menu-item>-->
 
-              <a-menu-item v-if="record.status==2">
-                <a-popconfirm title="确定解冻吗?" @confirm="() => handleFrozen(record.id,1,record.username)">
-                  <a>解冻</a>
-                </a-popconfirm>
-              </a-menu-item>
+<!--              <a-menu-item v-if="record.status==2">-->
+<!--                <a-popconfirm title="确定解冻吗?" @confirm="() => handleFrozen(record.id,1,record.username)">-->
+<!--                  <a>解冻</a>-->
+<!--                </a-popconfirm>-->
+<!--              </a-menu-item>-->
 
-              <a-menu-item>
-                <a href="javascript:;" @click="handleAgentSettings(record.username)">代理人</a>
-              </a-menu-item>
+<!--              <a-menu-item>-->
+<!--                <a href="javascript:;" @click="handleAgentSettings(record.username)">代理人</a>-->
+<!--              </a-menu-item>-->
 
             </a-menu>
           </a-dropdown>
@@ -234,13 +234,13 @@
             width: 100,
             dataIndex: 'realname',
           },
-          {
-            title: '头像',
-            align: "center",
-            width: 120,
-            dataIndex: 'avatar',
-            scopedSlots: {customRender: "avatarslot"}
-          },
+          // {
+          //   title: '头像',
+          //   align: "center",
+          //   width: 120,
+          //   dataIndex: 'avatar',
+          //   scopedSlots: {customRender: "avatarslot"}
+          // },
 
           {
             title: '性别',
@@ -258,21 +258,21 @@
           {
             title: '手机号码',
             align: "center",
-            width: 100,
+            width: 110,
             dataIndex: 'phone'
           },
-          {
-            title: '部门',
-            align: "center",
-            width: 180,
-            dataIndex: 'orgCodeTxt'
-          },
-          {
-            title: '负责部门',
-            align: "center",
-            width: 180,
-            dataIndex: 'departIds_dictText'
-          },
+          // {
+          //   title: '部门',
+          //   align: "center",
+          //   width: 180,
+          //   dataIndex: 'orgCodeTxt'
+          // },
+          // {
+          //   title: '负责部门',
+          //   align: "center",
+          //   width: 180,
+          //   dataIndex: 'departIds_dictText'
+          // },
           {
             title: '状态',
             align: "center",

@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.jeecg.modules.demo.dispatchmanage.mapper.DispatchMapper">
     <select id="getEmergencies" parameterType="java.lang.String" resultType="java.util.HashMap">
-        SELECT * FROM affair.emergency WHERE state='提交';
+        SELECT * FROM affair.emergency WHERE state not in ('决策完毕','未发布','已保存');
     </select>
 
     <select id="getTasks" parameterType="java.lang.String" resultType="java.util.HashMap">

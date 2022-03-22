@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-card >
+    <a-card>
       <a-row>
         <a-col :span="6">
           <a-cascader
@@ -9,15 +9,15 @@
             :load-data="loadSelectData"
             placeholder="Please select"
             change-on-select
-            style="width: 300px;margin-left: 20px"
+            style="width: 300px;margin-left: 10px"
             @change="onSelectChange"
           />
           <a-card style="min-height: 500px" :bordered="false">
             <a-list item-layout="horizontal"
                     :data-source="select_emergency_data">
               <a-list-item slot="renderItem" slot-scope="item, index">
-                <a @click="similarRecommend(item.task_id)" slot="actions">相似</a>
-                <a @click="ruleRecommend(item.task_id)" slot="actions">规则</a>
+                <a @click="similarRecommend(item)" slot="actions">相似</a>
+                <a @click="ruleRecommend(item)" slot="actions">规则</a>
                 <a-list-item-meta>
                   <span slot="title" >{{ item.task_name }}</span>
                 </a-list-item-meta>
@@ -47,10 +47,10 @@
                 <a @click="changeTask(record.task_id)">更改 </a>
               </span>
             </a-table>
-            <div v-show="ruleFlag">
-              <a-row>
-                <a-col :span="12">
-                  <a-card title="适用规则" :bordered="false">
+            <div v-show="ruleFlag" style="margin-top: -40px">
+              <a-row >
+                <a-col :span="12" >
+                  <a-card title="医疗救助适应规则" :bordered="false" >
                     <a-card-grid
                       v-for="i in ruleList"
                       :key="i.id"
@@ -96,38 +96,76 @@
           <a-card style="min-height: 300px" :bordered="!selectedTaskId">
 <!--            -->
             <div v-show="recommendTaskId">
-              <a-descriptions bordered  >
-                <a-descriptions-item label="Product">
-                  Cloud Database
-                </a-descriptions-item>
-                <a-descriptions-item label="Billing">
-                  Prepaid
-                </a-descriptions-item>
-                <a-descriptions-item label="Time">
-                  18:00:00
-                </a-descriptions-item>
-                <a-descriptions-item label="Amount">
-                  $80.00
-                </a-descriptions-item>
-                <a-descriptions-item label="Discount">
-                  $20.00
-                </a-descriptions-item>
-                <a-descriptions-item label="Official">
-                  $60.00
-                </a-descriptions-item>
-                <a-descriptions-item label="Config Info">
-                  Data disk type: MongoDB
-                  <br />
-                  Database version: 3.4
-                  <br />
-                  Package: dds.mongo.mid
-                  <br />
-                  Storage space: 10 GB
-                  Replication factor: 3
-                  Region: East China 1
-                  <br/>
-                </a-descriptions-item>
-              </a-descriptions>
+                <a-descriptions bordered>
+                  <a-descriptions-item label="任务ID">
+                    {{1}}
+                  </a-descriptions-item>
+                  <a-descriptions-item label="任务名称">
+                    {{"相关险情1"}}
+                  </a-descriptions-item>
+                  <a-descriptions-item label="任务优先级">
+                    {{"高"}}
+                  </a-descriptions-item>
+                  <a-descriptions-item label="负责人" >
+                    {{"袁野"}}
+                  </a-descriptions-item>
+                  <a-descriptions-item label="联系电话" :span="2">
+                    {{"18385029999"}}
+                  </a-descriptions-item>
+                  <a-descriptions-item label="选用规则" :span="3">
+                    <a-space>
+                      <a-badge status="processing" text="年龄20-25" />
+                      <a-badge status="processing" text="A血型" />
+                      <a-badge status="processing" text="男性" />
+                      <a-badge status="processing" text="大学及以上学历" />
+                    </a-space>
+                  </a-descriptions-item>
+                  <a-descriptions-item label="应急资源需求">
+                    {{"志愿者"}}
+                  </a-descriptions-item>
+                  <a-descriptions-item label="数量">
+                    {{"200"}}
+                  </a-descriptions-item>
+                  <a-descriptions-item label="集结点">
+                    {{"某人民广场"}}
+                  </a-descriptions-item>
+                  <a-descriptions-item label="注意事项" :span="3">
+                    {{"此救援动员任务主要目的是社会动员，希望动员大学生参与到志愿者行列"}}
+                    <!--                  <a-badge status="processing" :text="clickTaskName" />-->
+                  </a-descriptions-item>
+                </a-descriptions>
+<!--              <a-descriptions bordered  >-->
+<!--                <a-descriptions-item label="Product">-->
+<!--                  Cloud Database-->
+<!--                </a-descriptions-item>-->
+<!--                <a-descriptions-item label="Billing">-->
+<!--                  Prepaid-->
+<!--                </a-descriptions-item>-->
+<!--                <a-descriptions-item label="Time">-->
+<!--                  18:00:00-->
+<!--                </a-descriptions-item>-->
+<!--                <a-descriptions-item label="Amount">-->
+<!--                  $80.00-->
+<!--                </a-descriptions-item>-->
+<!--                <a-descriptions-item label="Discount">-->
+<!--                  $20.00-->
+<!--                </a-descriptions-item>-->
+<!--                <a-descriptions-item label="Official">-->
+<!--                  $60.00-->
+<!--                </a-descriptions-item>-->
+<!--                <a-descriptions-item label="Config Info">-->
+<!--                  Data disk type: MongoDB-->
+<!--                  <br />-->
+<!--                  Database version: 3.4-->
+<!--                  <br />-->
+<!--                  Package: dds.mongo.mid-->
+<!--                  <br />-->
+<!--                  Storage space: 10 GB-->
+<!--                  Replication factor: 3-->
+<!--                  Region: East China 1-->
+<!--                  <br/>-->
+<!--                </a-descriptions-item>-->
+<!--              </a-descriptions>-->
               <div class="button-action" >
                 <a-button type="primary">应用</a-button>
               </div>
@@ -142,7 +180,7 @@
               </p>
             </div>
 <!--            -->
-            <div v-show="ruleFlag" >
+            <div v-show="ruleFlag" style="margin-top: -10px">
               <a-form-model :model="taskDetailForm" :label-col="labelCol" :wrapper-col="wrapperCol">
                 <a-form-model-item
                   v-for="key in Object.keys(taskDetailForm)"
@@ -162,7 +200,7 @@
                 <a-space>
                   <a-button @click="clearTaskDetailForm">清空</a-button>
                   <a-button @click="useTaskDetailForm">应用</a-button>
-                  <a-button type="primary" :loading="publishLoading" @click="publishTaskDetailForm">应用并发布</a-button>
+                  <a-button type="primary" :loading="publishLoading" @click="publishTaskDetailForm">应用并执行</a-button>
                 </a-space>
               </div>
             </div>
@@ -185,37 +223,37 @@
 <script>
   const select_emergency_data = [
     {
-      task_id:'1',
-      task_name: 'Ant Design Title 1',
-    },
-    {
-      task_id:'2',
-      task_name: 'Ant Design Title 2',
-    },
-    {
-      task_id:'3',
-      task_name: 'Ant Design Title 3',
-    },
-    {
-      task_id:'4',
-      task_name: 'Ant Design Title 4',
-    },
-    {
-      task_id:'5',
-      task_name: 'Ant Design Title 1',
-    },
-    {
       task_id:'6',
-      task_name: 'Ant Design Title 2',
+      task_name: '医疗救护',
     },
     {
       task_id:'7',
-      task_name: 'Ant Design Title 3',
+      task_name: '重型设备',
     },
     {
       task_id:'8',
-      task_name: 'Ant Design Title 4',
+      task_name: '物资保障',
     },
+    // {
+    //   task_id:'4',
+    //   task_name: 'Ant Design Title 4',
+    // },
+    // {
+    //   task_id:'5',
+    //   task_name: 'Ant Design Title 1',
+    // },
+    // {
+    //   task_id:'6',
+    //   task_name: 'Ant Design Title 2',
+    // },
+    // {
+    //   task_id:'7',
+    //   task_name: 'Ant Design Title 3',
+    // },
+    // {
+    //   task_id:'8',
+    //   task_name: 'Ant Design Title 4',
+    // },
   ];
   const recommend_task_columns = [
     {
@@ -283,7 +321,7 @@
     },
     {
       task_id: '4',
-      task_name: '相关险情1',
+      task_name: '相关险情4',
       emergency_similar: '18%',
       injury_death_similar: '50%',
       address_similar:'40%',
@@ -291,7 +329,7 @@
     },
     {
       task_id: '5',
-      task_name: '相关险情2',
+      task_name: '相关险情5',
       emergency_similar: '20%',
       injury_death_similar: '20%',
       address_similar:'21%',
@@ -299,7 +337,7 @@
     },
     {
       task_id: '6',
-      task_name: '相关险情3',
+      task_name: '相关险情6',
       emergency_similar: '43%',
       injury_death_similar: '22%',
       address_similar:'64%',
@@ -312,13 +350,23 @@
       return {
         options: [
           {
-            value: 'zhejiang',
-            label: 'Zhejiang',
+            value: '自然灾害',
+            label: '自然灾害',
             isLeaf: false,
           },
           {
-            value: 'jiangsu',
-            label: 'Jiangsu',
+            value: '事故灾难',
+            label: '事故灾难',
+            isLeaf: false,
+          },
+          {
+            value: '公共卫生事件',
+            label: '公共卫生事件',
+            isLeaf: false,
+          },
+          {
+            value: '社会安全事件',
+            label: '社会安全事件',
             isLeaf: false,
           },
         ],
@@ -331,6 +379,7 @@
         //table
         recommend_task_data,
         recommend_task_columns,
+        task_name:'',
         // rule表
         ruleList:[
           {
@@ -381,9 +430,10 @@
         labelCol: { span: 2 },
         wrapperCol: { span: 20 },
         taskDetailForm: {
-          name1: 'abcd',
-          name2: 'abcd',
-          name3: 'abcd',
+          '任务优先级' : '高',
+          '参与人数' : '100',
+          '任务集结点': '某人民广场',
+          '注意事项' : '此任务主要是调配医疗救护经验丰富的护士参与救援',
         },
         // pop modal
         popModalVisible: false,
@@ -406,21 +456,25 @@
           targetOption.loading = false;
           targetOption.children = [
             {
-              label: `${targetOption.label} Dynamic 1`,
-              value: 'dynamic1',
+              label: `险情ID:4 多地发生洪涝灾害`,
+              value: '多地发生洪涝灾害',
             },
-            {
-              label: `${targetOption.label} Dynamic 2`,
-              value: 'dynamic2',
-            },
+            // {
+            //   label: `${targetOption.label} Dynamic 1`,
+            //   value: 'dynamic1',
+            // },
+            // {
+            //   label: `${targetOption.label} Dynamic 2`,
+            //   value: 'dynamic2',
+            // },
           ];
           this.options = [...this.options];
         }, 1000);
       },
       //相似推荐
-      similarRecommend(task_id){
+      similarRecommend(item){
         this.clearAllInfo()
-        this.selectedTaskId = task_id
+        this.selectedTaskId = item.task_id
         this.ruleFlag=false
       },
       //详情相似推荐的任务
@@ -434,10 +488,12 @@
         console.log(task_id)
       },
       //规则推荐
-      ruleRecommend(task_id){
+      ruleRecommend(item){
         this.clearAllInfo()
-        this.selectedTaskId = task_id
+        this.selectedTaskId = item.task_id
         this.ruleFlag=true
+        this.task_name = item.task_name
+        console.log()
       },
       //规则选用
       onRuleClick(checkedValues) {

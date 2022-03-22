@@ -141,7 +141,7 @@
                 }
               })
               let option = {
-                title: { text: '数据仓库关系图谱',textStyle:{
+                title: { text: '星型维度模型图',textStyle:{
                   fontSize:20
                   }
                 },

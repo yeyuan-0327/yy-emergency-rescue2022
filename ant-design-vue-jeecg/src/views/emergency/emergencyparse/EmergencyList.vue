@@ -18,6 +18,7 @@
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
               <a-button type="primary" @click="searchAllQuery" icon="search">查询</a-button>
               <a-button type="primary" @click="searchAllReset" icon="reload" style="margin-left: 8px">重置</a-button>
+              <a-button type="primary" @click="searchAllReset" icon="check" style="margin-left: 8px">置为保存</a-button>
             </span>
           </a-col>
         </a-row>
@@ -25,18 +26,19 @@
     </div>
     <!-- 查询区域-END -->
     <a-row>
-        <a-col :span="10" >
+        <a-col :span="11" >
           <a-table :columns="emergencyColumns"
                    :data-source="emergencyData"
                    rowKey="id"
                    :pagination="false"
                    :scroll="{y:500 }"
+                   :rowSelection="{selectedRowKeys: selectedEmergencyRowKeys, onChange: onSelectEmergencyChange}"
           >
             <a slot="emergencyName" slot-scope="text, data" @click="emNameClick(text,data)">{{ text }}</a>
             <span slot="customTitle"><a-icon type="alert" />险情名称</span>
           </a-table>
         </a-col>
-        <a-col :span="14">
+        <a-col :span="13">
           <div style="margin-left: 20px">
             <div>
               <div class="ant-alert ant-alert-info" style="margin-bottom: 5px;">
@@ -68,6 +70,8 @@
                 </span>
                 <span slot="action" slot-scope="text, record">
                   <a @click="clickTaskToShowDetail(record)">详情</a>
+                  <a-divider v-if="record.statue === 1"  type="vertical" />
+                  <a v-if="record.statue === 1" @click="clickTaskToShowDetail(record)">优化</a>
                   <a-divider type="vertical" />
                   <a-popconfirm title="确定删除吗?" @confirm="() => handleTaskDelete(record.id)">
                     <a>删除</a>
@@ -78,32 +82,37 @@
             <br>
             <div>
               <a-descriptions bordered>
-                <a-descriptions-item label="Product">
+                <a-descriptions-item label="任务ID">
+                  {{1}}
+                </a-descriptions-item>
+                <a-descriptions-item label="任务名称">
                   {{clickTaskName}}
                 </a-descriptions-item>
-                <a-descriptions-item label="Billing Mode">
-                  {{clickTaskName}}
+                <a-descriptions-item label="任务优先级">
+                  {{"高"}}
                 </a-descriptions-item>
-                <a-descriptions-item label="Automatic Renewal">
-                  {{clickTaskName}}
+                <a-descriptions-item label="负责人" >
+                  {{"袁野"}}
                 </a-descriptions-item>
-                <a-descriptions-item label="Order time" >
-                  {{clickTaskName}}
+                <a-descriptions-item label="联系电话" :span="2">
+                  {{"18385029999"}}
                 </a-descriptions-item>
-                <a-descriptions-item label="Usage Time" :span="2">
-                  {{clickTaskName}}
+                <a-descriptions-item label="选用规则" :span="3">
+                  {{"未指定救援对应规则"}}
+<!--                  <a-badge status="processing" :text="clickTaskName" />-->
                 </a-descriptions-item>
-                <a-descriptions-item label="Status" :span="3">
-                  <a-badge status="processing" :text="clickTaskName" />
+                <a-descriptions-item label="应急资源需求">
+                  {{"志愿者"}}
                 </a-descriptions-item>
-                <a-descriptions-item label="Negotiated Amount">
-                  {{clickTaskName}}
+                <a-descriptions-item label="数量">
+                  {{"200"}}
                 </a-descriptions-item>
-                <a-descriptions-item label="Discount">
-                  {{clickTaskName}}
+                <a-descriptions-item label="集结点">
+                  {{"某人民广场"}}
                 </a-descriptions-item>
-                <a-descriptions-item label="Official Receipts">
-                  {{clickTaskName}}
+                <a-descriptions-item label="注意事项" :span="3">
+                  {{"此救援动员任务主要目的是社会动员，希望动员大学生参与到志愿者行列"}}
+                  <!--                  <a-badge status="processing" :text="clickTaskName" />-->
                 </a-descriptions-item>
               </a-descriptions>
             </div>
@@ -158,12 +167,12 @@
         clickEmergencyId:'',
         //task
         taskColumns:[
-          {
-            title: 'ID',
-            dataIndex: 'id',
-            key: 'id',
-            width:90,
-          },
+          // {
+          //   title: 'ID',
+          //   dataIndex: 'id',
+          //   key: 'id',
+          //   width:90,
+          // },
           {
             title: '任务名称',
             dataIndex: 'name',
@@ -184,6 +193,7 @@
         ],
         taskData:[],
         selectedTaskRowKeys:[],
+        selectedEmergencyRowKeys:[],
         clickTaskName:'',
         //
         searchEmergencyName:'',
@@ -219,9 +229,13 @@
       searchAllReset(){
 
       },
-      // 选择
+      // 选择任务
       onSelectChange(selectedRowKeys){
         this.selectedTaskRowKeys = selectedRowKeys
+      },
+      // 选择险情
+      onSelectEmergencyChange(selectedRowKeys){
+        this.selectedEmergencyRowKeys = selectedRowKeys
       },
       // clear 选项
       onClearSelected(){
@@ -244,6 +258,7 @@
       // show task detail
       clickTaskToShowDetail(record){
         this.clickTaskName = record.name
+        console.log(record.id)
       },
       // get emergency
       initEmergencyList(){

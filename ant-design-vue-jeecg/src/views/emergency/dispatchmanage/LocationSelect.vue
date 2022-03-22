@@ -53,6 +53,12 @@
                 <a-button type="primary" @click="lngLatConfirm" :disabled="!clickMapPoint">确认</a-button>
               </a-space>
               <div style="margin-top: 10px">
+                <a-space :size="20">
+                <span class="input-item-text">负责人</span> <a-input v-model = "principal" type="text"  style="width: 200px" :disabled="lngLat===''"></a-input>
+                  <span class="input-item-text" >电话</span> <a-input :value="phone" type="text" style="width: 300px" :disabled="lngLat===''"></a-input>
+                </a-space>
+              </div>
+              <div style="margin-top: 12px">
               <a-space :size="6">
               <span class="input-item-text" >地点说明</span>
               <a-input v-model = "explain" type="text"  style="width: 400px" :disabled="lngLat===''"></a-input>
@@ -77,7 +83,7 @@
 
   const columns = [
     {
-      title: '任务序号',
+      title: '任务ID',
       width:80,
       dataIndex: 'task_id',
     },
@@ -125,9 +131,12 @@
     data(){
       return{
         activeKey: [],
+        // task_setting
         address:'',
         lngLat:'',
         explain:'',
+        principal:'',
+        phone:'',
         // 折叠面板数据
         paddleData:[],
         columns,
@@ -179,6 +188,7 @@
             // 默认打开第一个
             this.activeKey=[this.paddleData[0].id]
             // 通过险情ID获取全部任务地址信息
+            // 这里有 bug id
             this.getTaskAddsByEmergencyId(this.paddleData[0].id)
           }
         })

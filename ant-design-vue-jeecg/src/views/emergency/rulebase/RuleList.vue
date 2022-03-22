@@ -127,9 +127,9 @@
             dataIndex: 'type',
           },
           {
-            title: '所属险情',
+            title: '所属类型',
             align:"center",
-            dataIndex: 'task_type',
+            dataIndex: 'rule_type',
           },
           {
             title: '生效时间',
@@ -180,7 +180,7 @@
             type: "",
             path: "",
             meta: "",
-            task_type:"",
+            rule_type:"",
           }
         ],
       }
@@ -227,7 +227,7 @@
         this.rule.type=record.type;
         this.rule.path=record.path;
         this.rule.meta=record.meta;
-        this.rule.task_type=record.task_type;
+        this.rule.rule_type=record.rule_type;
         this.invalid_date=record.invalid_date;
       },
       //详情关闭按钮
